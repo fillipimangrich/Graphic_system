@@ -1,11 +1,11 @@
 import tkinter as tk
 
 class View():
-    def __init__(self) -> None:
+    def __init__(self, controller) -> None:
         self.__window = tk.Tk()
+        self.__controller = controller
         self.__click_count = 0
-        self.__x = 0
-        self.__y = 0
+
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -46,7 +46,7 @@ class View():
 
     def openViewForAddNewShape(self) -> None:
         pass
-    
+
     def draw(self, event):
         if (not self.__click_count):
             self.__x = event.x
@@ -65,6 +65,10 @@ class View():
         self.__view_port.create_oval(x1, y1, x2, y2, fill=BLACK)
 
     def drawLine(self,event):
-        x1, y1 = (self.__x), (self.__y)
-        x2, y2 = (event.x), (event.y)
-        self.__view_port.create_line(x1, y1, x2, y2, fill="#ff0000")
+        pass
+        # x1, y1 = (self.__x), (self.__y)
+        # x2, y2 = (event.x), (event.y)
+        # self.__view_port.create_line(x1, y1, x2, y2, fill="#ff0000")
+
+    def update(self):
+        pass
