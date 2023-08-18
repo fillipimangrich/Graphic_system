@@ -4,8 +4,6 @@ class View():
     def __init__(self, controller) -> None:
         self.__window = tk.Tk()
         self.__controller = controller
-        self.__click_count = 0
-
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -48,20 +46,12 @@ class View():
         pass
 
     def draw(self, event):
-        if (not self.__click_count):
-            self.__x = event.x
-            self.__y = event.y
-            self.drawPoint(event)
-            self.__click_count += 1
-        else:
-            self.drawLine(event)
-            self.__click_count = 0
+        self.drawPoint(event)
         
-
     def drawPoint(self,event):
         BLACK = "#000000"
-        x1, y1 = (event.x - 1), (event.y - 1)
-        x2, y2 = (event.x + 1), (event.y + 1)
+        x1, y1 = (event.x - 2), (event.y - 2)
+        x2, y2 = (event.x + 2), (event.y + 2)
         self.__view_port.create_oval(x1, y1, x2, y2, fill=BLACK)
 
     def drawLine(self,event):
