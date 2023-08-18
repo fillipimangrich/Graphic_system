@@ -1,4 +1,4 @@
-from BaseShape import Shape
+from Shape import Shape
 
 class Point(Shape):
     def __init__(self) -> None:
