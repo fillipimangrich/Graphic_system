@@ -1,11 +1,13 @@
 import tkinter as tk
 from src.Controllers.Controller import Controller
+from src.shapes.Point import Point
 from src.shapes.Line import Line
 class View():
     def __init__(self) -> None:
         self.__window = tk.Tk()
         self.__controller = Controller()
-        self.__controller.addObject(Line("linha 1", "linha", [(50,50,0), (75,75,0)]))
+        self.__line_width = 3
+        self.__controller.addObject(Line("linha 1", [(50,50,0), (75,75,0)]))
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -15,7 +17,7 @@ class View():
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
-        self.drawLine(self.__controller.getListOfObjects()[0])
+        self.draw()
         self.__window.mainloop()
 
     def setViewPort(self) -> None:
@@ -63,31 +65,35 @@ class View():
 
     def openViewForAddNewShape(self) -> None:
         pass
+    
 
-    def draw(self, event):
+    def draw(self):
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
             trasnformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
 
-            object_type = obj.getType()
-            if object_type == "Point":
+            object_type = type(obj)
+            if object_type == Point:
                 self.drawPoint(color, trasnformed_coordinates)
-            elif object_type == "Line":
+            elif object_type == Line:
                 self.drawLine(color, trasnformed_coordinates)
             else:
-                self.drawPoligone(color, trasnformed_coordinates)
+                self.drawWireFrame(color, trasnformed_coordinates)
         
-    def drawPoint(self,event):
-        BLACK = "#000000"
-        x1, y1 = (event.x - 2), (event.y - 2)
-        x2, y2 = (event.x + 2), (event.y + 2)
-        self.__view_port.create_oval(x1, y1, x2, y2, fill=BLACK)
+    def drawPoint(self, color, coordinates):
+        p1 = coordinates[0]
+        x, y = p1
+        self.__view_port.create_oval(x-1, y-1, x+1, y+1, fill=color)
 
-    def drawLine(self,line):
-        x1, y1, z1 = line.getCoordinates()[0]
-        x2, y2, z2 = line.getCoordinates()[1]
-        self.__view_port.create_line(x1, y1, x2, y2, fill="#ff0000")
+    def drawLine(self, color, coordinates):
+        p1, p2 = coordinates
+        x1, y1 = p1
+        x2, y2 = p2
+        self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
+    def drawWireFrame(self, color, coordinates):
+        pass
 
     def update(self):
         pass
