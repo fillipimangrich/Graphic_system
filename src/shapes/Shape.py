@@ -1,10 +1,11 @@
 from abc import ABC
 
 class Shape():
-    def __init__(self, name, type, coordinates) -> None:
+    def __init__(self, name, type, coordinates, color='#000000') -> None:
         self.__coordinates = coordinates
         self.__name = name
         self.__type  = type
+        self.__color = color
 
     #coordinate need to be a tuple (x,y,z)
     def addNewCoordinate(self, coordinate):
@@ -24,5 +25,6 @@ class Shape():
 
     def setType(self, type):
         self.__type = type
-
-
+    
+    def getColor(self):
+        return self.__color

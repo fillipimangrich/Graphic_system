@@ -15,7 +15,7 @@ class View():
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
-        self.drawLine(self.__controller.getLisOfObjects()[0])
+        self.drawLine(self.__controller.getListOfObjects()[0])
         self.__window.mainloop()
 
     def setViewPort(self) -> None:
@@ -65,8 +65,18 @@ class View():
         pass
 
     def draw(self, event):
-        print(event.x, event.y)
-        self.drawPoint(event)
+        for obj in self.__controller.getListOfObjects():
+            color = obj.getColor()
+            coordinates = obj.getCoordinates()
+            trasnformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
+
+            object_type = obj.getType()
+            if object_type == "Point":
+                self.drawPoint(color, trasnformed_coordinates)
+            elif object_type == "Line":
+                self.drawLine(color, trasnformed_coordinates)
+            else:
+                self.drawPoligone(color, trasnformed_coordinates)
         
     def drawPoint(self,event):
         BLACK = "#000000"
