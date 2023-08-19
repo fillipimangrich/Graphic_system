@@ -1,7 +1,7 @@
 from abc import ABC
 
 class Shape():
-    def __init__(self, name, type, *coordinates) -> None:
+    def __init__(self, name, type, coordinates) -> None:
         self.__coordinates = coordinates
         self.__name = name
         self.__type  = type
@@ -9,6 +9,9 @@ class Shape():
     #coordinate need to be a tuple (x,y,z)
     def addNewCoordinate(self, coordinate):
         self.__coordinates.append(coordinate)
+
+    def getCoordinates(self):
+        return self.__coordinates
     
     def getName(self):
         return self.__name

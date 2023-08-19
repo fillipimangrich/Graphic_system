@@ -1,9 +1,11 @@
 import tkinter as tk
 from src.Controllers.Controller import Controller
+from src.shapes.Line import Line
 class View():
     def __init__(self) -> None:
         self.__window = tk.Tk()
         self.__controller = Controller()
+        self.__controller.addObject(Line("linha 1", "linha", [(50,50,0), (75,75,0)]))
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -13,6 +15,7 @@ class View():
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
+        self.drawLine(self.__controller.getLisOfObjects()[0])
         self.__window.mainloop()
 
     def setViewPort(self) -> None:
@@ -71,11 +74,10 @@ class View():
         x2, y2 = (event.x + 2), (event.y + 2)
         self.__view_port.create_oval(x1, y1, x2, y2, fill=BLACK)
 
-    def drawLine(self,event):
-        pass
-        # x1, y1 = (self.__x), (self.__y)
-        # x2, y2 = (event.x), (event.y)
-        # self.__view_port.create_line(x1, y1, x2, y2, fill="#ff0000")
+    def drawLine(self,line):
+        x1, y1, z1 = line.getCoordinates()[0]
+        x2, y2, z2 = line.getCoordinates()[1]
+        self.__view_port.create_line(x1, y1, x2, y2, fill="#ff0000")
 
     def update(self):
         pass
