@@ -1,9 +1,9 @@
 import tkinter as tk
-
+from src.Controller.Controller import Controller
 class View():
-    def __init__(self, controller) -> None:
+    def __init__(self) -> None:
         self.__window = tk.Tk()
-        self.__controller = controller
+        self.__controller = Controller()
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -62,6 +62,7 @@ class View():
         pass
 
     def draw(self, event):
+        print(event.x, event.y)
         self.drawPoint(event)
         
     def drawPoint(self,event):
