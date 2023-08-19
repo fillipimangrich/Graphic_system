@@ -7,7 +7,8 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__controller.addObject(Line("linha 1", [(50,50,0), (75,75,0)]))
+        self.__drawing_object = "Line"
+        self.__points_counter = 0
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -67,20 +68,43 @@ class View():
         pass
     
 
-    def draw(self):
+    def draw(self, event=None):
+        if(event is not None):
+            self.handleWithEvent(event)
+
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
-            trasnformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
-
+            print(coordinates)
+            transformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
+            print(transformed_coordinates)
             object_type = type(obj)
+
             if object_type == Point:
-                self.drawPoint(color, trasnformed_coordinates)
+                self.drawPoint(color, transformed_coordinates)
             elif object_type == Line:
-                self.drawLine(color, trasnformed_coordinates)
+                self.drawLine(color, transformed_coordinates)
             else:
-                self.drawWireFrame(color, trasnformed_coordinates)
-        
+                self.drawWireFrame(color, transformed_coordinates)
+    
+
+    def handleWithEvent(self, event):
+        if(self.__drawing_object == 'Point'):
+            point = Point("ponto", [(event.x, event.y, 0)])
+            self.__controller.addObject(point)
+        elif(self.__drawing_object == 'Line'):
+            if(self.__points_counter == 0):
+                point = Point("ponto", [(event.x, event.y, 0)])
+                self.__controller.addObject(point)
+                self.__points_counter += 1
+            else:
+                first_point = self.__controller.getListOfObjects()[-1]
+                line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                self.__controller.getListOfObjects().pop()
+                self.__controller.addObject(line)
+                self.__points_counter = 0
+
+
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
         x, y = p1

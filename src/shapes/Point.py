@@ -1,5 +1,5 @@
 from src.shapes.Shape import Shape
 
 class Point(Shape):
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, name, coordinates) -> None:
+        super().__init__(name=name, coordinates=coordinates)
