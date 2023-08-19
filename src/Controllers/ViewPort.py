@@ -24,7 +24,7 @@ class ViewPort():
             Ywmin = self.__window.get_Ywmin()
             Ywmax = self.__window.get_Ywmax()
 
-            xvp = self.__Xvpmin + ((xw - Xwmin) / (Xwmax - Xwmin)) * (self.__Xvpmax - self.__Xvpmin)
+            xvp = ((xw - Xwmin) / (Xwmax - Xwmin)) * (self.__Xvpmax - self.__Xvpmin)
             yvp = self.__Yvpmin + ((yw - Ywmin) / (Ywmax - Ywmin)) * (self.__Yvpmax - self.__Yvpmin)
 
             transformed_coordinates.append((xvp, yvp))

@@ -2,12 +2,13 @@ import tkinter as tk
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
 from src.shapes.Line import Line
+from src.shapes.WireFrame import WireFrame
 class View():
     def __init__(self) -> None:
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Line"
+        self.__drawing_object = "Wire Frame"
         self.__points_counter = 0
 
     def run(self) -> None:
@@ -18,14 +19,18 @@ class View():
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
-        self.draw()
         self.__window.mainloop()
+        
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
             self.__window,bg = "#FFFFFF",height = 460,width = 920,bd = 0,highlightthickness = 0,relief = "ridge")
         self.__view_port.place(x=340, y=20)
         self.__view_port.bind("<Button-1>", self.draw)
+
+        #TO DO: DRAW THE LINE BASED IN THE POSITION OF THE CURSOR
+
+        # self.__view_port.bind("<B1-Motion>", self.draw)
 
 
     def setLogOfActionsView(self) -> None:
@@ -55,11 +60,16 @@ class View():
     def setZoomButtons(self) -> None:
         self.__zoom_in_button = tk.PhotoImage(file=f"src\Images\zoomIn.png")
         button_zoom_in = self.__control.create_image(20, 25, image = self.__zoom_in_button)
-        self.__control.tag_bind(button_zoom_in, "<Button-1>", lambda x: print("Zoom In") )
+        self.__control.tag_bind(button_zoom_in, "<Button-1>", lambda x: print("zoom") )
+        
         self.__zoon_out_button = tk.PhotoImage(file =f"src\Images\zoomOut.png")
         button_zoom_out = self.__control.create_image(20, 70, image = self.__zoon_out_button)
-        self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: print("Zoom Out") )
+        self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: print("zoom") )
 
+    def move(self):
+        self.__controller.moveRight()
+        print("juahgdfuiawghidgiaw")
+    
     def setMoveButtons(self) -> None:
         pass
 
@@ -69,15 +79,14 @@ class View():
     
 
     def draw(self, event=None):
+        self.setViewPort()
         if(event is not None):
             self.handleWithEvent(event)
 
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
-            print(coordinates)
             transformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
-            print(transformed_coordinates)
             object_type = type(obj)
 
             if object_type == Point:
@@ -103,7 +112,25 @@ class View():
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(line)
                 self.__points_counter = 0
-
+        elif(self.__drawing_object == 'Wire Frame'):
+            if(self.__points_counter == 0):
+                point = Point("ponto", [(event.x, event.y, 0)])
+                self.__controller.addObject(point)
+                self.__points_counter += 1
+            elif(self.__points_counter == 1):
+                first_point = self.__controller.getListOfObjects()[-1]
+                line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                self.__controller.getListOfObjects().pop()
+                self.__controller.addObject(line)
+                self.__points_counter += 1
+            else:
+                last_object = self.__controller.getListOfObjects()[-1]
+                points = [x for x in last_object.getCoordinates()]
+                points.append((event.x,event.y,0))
+                wire_frame = WireFrame("wire frame", points)
+                self.__controller.getListOfObjects().pop()
+                self.__controller.addObject(wire_frame)
+                self.__points_counter += 1
 
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
@@ -117,7 +144,20 @@ class View():
         self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawWireFrame(self, color, coordinates):
-        pass
+        for point in range(len(coordinates)):
+            if (not point == (len(coordinates)-1)):
+                p1 = coordinates[point]
+                p2 = coordinates[point + 1]
+                x1, y1 = p1
+                x2, y2 = p2
+                self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+            else:
+                p1 = coordinates[-1]
+                p2 = coordinates[0]
+                x1, y1 = p1
+                x2, y2 = p2
+                self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
 
     def update(self):
         pass
