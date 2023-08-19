@@ -1,23 +1,14 @@
 from abc import ABC
 
 class Shape():
-    def __init__(self, name, type, x, y) -> None:
-        self.__x = x
-        self.__y = y
+    def __init__(self, name, type, *coordinates) -> None:
+        self.__coordinates = coordinates
         self.__name = name
         self.__type  = type
 
-    def getX(self):
-        return self.__x
-    
-    def setX(self, x):
-        self.__x = x
-
-    def getY(self):
-        return self.__y
-    
-    def setY(self, y):
-        self.__y = y
+    #coordinate need to be a tuple (x,y,z)
+    def addNewCoordinate(self, coordinate):
+        self.__coordinates.append(coordinate)
     
     def getName(self):
         return self.__name

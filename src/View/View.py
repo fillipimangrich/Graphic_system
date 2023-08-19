@@ -1,5 +1,5 @@
 import tkinter as tk
-from src.Controller.Controller import Controller
+from src.Controllers.Controller import Controller
 class View():
     def __init__(self) -> None:
         self.__window = tk.Tk()
