@@ -45,24 +45,15 @@ class Window():
     
     def updateObjects(self):
         to_be_Draw = []
-        print("lnafiuw")
-        print(len(self.__world.getObjects()))
-        print("ahdfnuiwahgdui")
         for obj in self.__world.getObjects():
             for coordinate in obj.getCoordinates():
                 x,y,z = coordinate
-                print(x,y)
-                print(self.__Xwmin, self.__Xwmax)
-                print(self.__Ywmin, self.__Ywmax)
-                print((
-                    ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
-                    ((y >= self.__Ywmin) and (y <= self.__Ywmax))
-                    ))
                 if (
                     ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
                     ((y >= self.__Ywmin) and (y <= self.__Ywmax))
                     ):
                     to_be_Draw.append(obj)
+                    break
                     
         self.setObjectsToBeDraw(to_be_Draw)
     

@@ -1,3 +1,4 @@
+import copy
 from src.Controllers.Window import Window
 
 class ViewPort():
@@ -23,7 +24,7 @@ class ViewPort():
         self.transformAllObjects()
 
     def transformAllObjects(self):
-        to_be_draw_copy = self.__window.getObjectsToBeDraw()[::]
+        to_be_draw_copy = copy.deepcopy(self.__window.getObjectsToBeDraw())
         for obj in to_be_draw_copy:
             new_coordinates = self.viewportTransform(obj.getCoordinates())
             obj.setCoordinates(new_coordinates)

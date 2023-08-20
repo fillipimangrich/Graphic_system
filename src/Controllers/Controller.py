@@ -7,12 +7,15 @@ class Controller():
         self.__size_of_move = 50
 
 
-    def getListOfObjects(self):
+    def getListOfObjects(self): 
         return self.__viewport.getObjectsToBeDrawTransformed()
 
     def addObject(self, object):
         self.__viewport.getWindow().getWorld().addObject(object)
         self.__viewport.update()
+    
+    def popWorldObject(self):
+        self.__viewport.getWindow().getWorld().getObjects().pop()
     
     def getViewport(self):
         return self.__viewport

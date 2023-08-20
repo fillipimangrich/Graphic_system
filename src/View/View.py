@@ -8,9 +8,8 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Point"
+        self.__drawing_object = "Line"
         self.__points_counter = 0
-        self.__logs = []
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -164,7 +163,7 @@ class View():
                 first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
-                self.__controller.getListOfObjects().pop()
+                self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter = 0
 
