@@ -8,7 +8,7 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Wire Frame"
+        self.__drawing_object = "Line"
         self.__points_counter = 0
         self.__logs = []
 
@@ -79,11 +79,11 @@ class View():
     def setZoomButtons(self) -> None:
         self.__zoom_in_button = tk.PhotoImage(file=f"src\Images\zoomIn.png")
         button_zoom_in = self.__control.create_image(20, 25, image = self.__zoom_in_button)
-        self.__control.tag_bind(button_zoom_in, "<Button-1>", lambda x: print("zoom") )
+        self.__control.tag_bind(button_zoom_in, "<Button-1>", lambda x: self.zoom(type('event', (object,), {'delta': 1})()))
         
         self.__zoon_out_button = tk.PhotoImage(file =f"src\Images\zoomOut.png")
         button_zoom_out = self.__control.create_image(20, 70, image = self.__zoon_out_button)
-        self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: print("zoom") )
+        self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: self.zoom(type('event', (object,), {'delta': 0})()) )
     
     def addLogs(self, message: str) -> None:
         self.__log_actions_view.create_text(10, self.log_y_position, text=message, anchor="w")
