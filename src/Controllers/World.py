@@ -9,3 +9,6 @@ class World():
     def getObjects(self):
         return self.__list_of_objects
     
+    def removeObject(self, object):
+        self.__list_of_objects.remove(object)
+    

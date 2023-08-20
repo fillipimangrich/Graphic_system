@@ -1,4 +1,5 @@
 import tkinter as tk
+from tkinter.colorchooser import askcolor
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
 from src.shapes.Line import Line
@@ -43,11 +44,9 @@ class View():
         self.log_frame = tk.Frame(self.__window)
         self.log_frame.place(x=340, y=500, width=920, height=200)
 
-        # Scrollbar
         self.scroll_y = tk.Scrollbar(self.log_frame, orient="vertical")
         self.scroll_y.pack(side="right", fill="y")
 
-        # Canvas
         self.__log_actions_view = tk.Canvas(
             self.log_frame, bg="#FFFFFF", bd=0, highlightthickness=0, relief="ridge", yscrollcommand=self.scroll_y.set)
         self.__log_actions_view.pack(side="left", fill="both", expand=True)
@@ -58,8 +57,10 @@ class View():
     
     def setListOfObjectsView(self) -> None:
         self.__list_of_objects_view = tk.Canvas(
-            self.__window,bg = "#FFFFFF",height = 240,width = 300,bd = 0,highlightthickness = 0,relief = "ridge")
+        self.__window,bg = "#FFFFFF",height = 240,width = 300,bd = 0,highlightthickness = 0,relief = "ridge")
         self.__list_of_objects_view.place(x=20, y=20)
+        self.__object_list_items = {}
+        self.__list_y_position = 10
 
     def setControlView(self) -> None:
         self.__control = tk.Canvas(
@@ -73,7 +74,6 @@ class View():
         self.__add_object_button = tk.PhotoImage(file = f"src/Images/add_button.png")
         button_add = self.__control.create_image(220, 50, image=self.__add_object_button)
         self.__control.tag_bind(button_add, "<Button-1>", lambda x: print("Adicionou objeto"))
-
 
     def setZoomButtons(self) -> None:
         self.__zoom_in_button = tk.PhotoImage(file=f"src\Images\zoomIn.png")
@@ -94,6 +94,60 @@ class View():
     def update_mesage(self):
         self._canvas.itemconfig(self.mesage_var, text =self._mensagem)
     
+    def addObjectToList(self, obj):
+        tag = obj.getId()
+        name = obj.getName()
+        x = 10
+        y = self.__list_y_position
+
+        canvas_id = self.__list_of_objects_view.create_text(x, y, text=name, anchor="w", tags=(tag,))
+        
+        self.__object_list_items[tag] = (canvas_id, obj)
+
+        self.__list_of_objects_view.tag_bind(canvas_id, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
+        self.__list_y_position += 20
+
+    def onObjectClicked(self, obj):
+        popup = tk.Toplevel()
+        popup.title("Opções")
+
+        delete_button = tk.Button(popup, text="Apagar objeto", command=lambda: self.deleteObject(obj, popup))
+        delete_button.pack(pady=10)
+
+        color_button = tk.Button(popup, text="Trocar Cor", command=lambda: self.changeObjectColor(obj, popup))
+        color_button.pack(pady=10)
+
+    def redrawObjectList(self):
+        self.__list_of_objects_view.delete("all")
+
+        self.__list_y_position = 10 
+
+        for tag, (_, obj) in self.__object_list_items.items():
+            self.addObjectToList(obj)
+
+    def deleteObject(self, obj, popup):
+        tag = obj.getId()     
+        if tag in self.__object_list_items:
+            del self.__object_list_items[tag]
+
+        self.__controller.removeObject(obj)     
+        self.addLogs('Apagou objeto ' + obj.getName())
+        self.redrawObjectList()
+        self.draw()
+        popup.destroy()
+        self.__list_of_objects_view.update()
+
+    def changeObjectColor(self, obj, popup):
+        color_code, color_hex = askcolor(title="Escolha uma cor")
+
+        if color_hex:
+            obj.setColor(color_hex)
+            self.addLogs('Alterou a cor do objeto ' + obj.getName())
+            self.__controller.update()
+            self.draw()
+
+        popup.destroy()
+
     def arrow_key_pressed(self, event):
         if event.keysym == "Up":
             self.__controller.moveUp()
@@ -165,6 +219,7 @@ class View():
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
+                self.addObjectToList(line)
                 self.__points_counter = 0
 
         elif(self.__drawing_object == 'Wire Frame'):

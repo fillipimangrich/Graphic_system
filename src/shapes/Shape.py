@@ -1,7 +1,9 @@
 from abc import ABC
+import random
 
 class Shape():
     def __init__(self, name, coordinates, color='#000000') -> None:
+        self.__id = random.randint(1, 1000000)
         self.__name = name
         self.__coordinates = coordinates
         self.__color = color
@@ -12,6 +14,9 @@ class Shape():
 
     def setCoordinates(self, coordinates):
         self.__coordinates = coordinates
+    
+    def getId(self):
+        return self.__id
 
     def getCoordinates(self):
         return self.__coordinates
@@ -30,3 +35,6 @@ class Shape():
     
     def getColor(self):
         return self.__color
+    
+    def setColor(self, color):
+        self.__color = color

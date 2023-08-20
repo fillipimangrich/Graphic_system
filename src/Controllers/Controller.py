@@ -13,12 +13,19 @@ class Controller():
     def addObject(self, object):
         self.__viewport.getWindow().getWorld().addObject(object)
         self.__viewport.update()
+
+    def removeObject(self, object):
+        self.__viewport.getWindow().getWorld().removeObject(object)
+        self.__viewport.update()
     
     def popWorldObject(self):
         self.__viewport.getWindow().getWorld().getObjects().pop()
     
     def getViewport(self):
         return self.__viewport
+    
+    def update(self):
+        self.__viewport.update()
     
     def moveUp(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() - self.__size_of_move)
