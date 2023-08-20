@@ -45,17 +45,87 @@ class Window():
     
     def updateObjects(self):
         to_be_Draw = []
+
         for obj in self.__world.getObjects():
-            for coordinate in obj.getCoordinates():
-                x,y,z = coordinate
-                if (
-                    ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
-                    ((y >= self.__Ywmin) and (y <= self.__Ywmax))
+            coordinates = obj.getCoordinates()
+            for point in range(len(coordinates)):
+                if (not point == (len(coordinates)-1)):
+                    p1 = coordinates[point]
+                    p2 = coordinates[point + 1]
+                    x1, y1, z1 = p1
+                    x2, y2, z2 = p2
+                    
+                else:
+                    p1 = coordinates[-1]
+                    p2 = coordinates[0]
+                    x1, y1, z1 = p1
+                    x2, y2, z2 = p2
+                
+                if(
+                    #Point one inside
+                    (
+                    (((x1 >= self.__Xwmin) and (x1 <= self.__Xwmax)) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax))) 
+                    or
+                    #Point two inside
+                    (((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax)) and
+                    ((y2 >= self.__Ywmin) and (y2 <= self.__Ywmax))))
+
+                    or
+
+                    #crossing horizontally
+                    (((x1 < self.__Xwmin) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax))) 
+                    and
+                    ((x2 > self.__Xwmax) and
+                    ((y2 >= self.__Ywmin) and (y2 <= self.__Ywmax))))
+
+                    or
+                    #crossing vertically
+                    (((y1 < self.__Ywmin) and
+                    ((x1 >= self.__Xwmin) and (x1 <= self.__Xwmax))) 
+                    and
+                    ((y2 > self.__Ywmax) and
+                    ((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax))))
+                    
+                    or
+                    #crossing diagonally left to top
+                    (((x1 < self.__Xwmin) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax))) 
+                    and
+                    ((y2 < self.__Ywmin) and
+                    ((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax))))
+
+                    or
+                    #crossing diagonally left to bottom
+                    (((x1 < self.__Xwmin) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax))) 
+                    and
+                    ((y2 > self.__Ywmax) and
+                    ((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax))))
+
+                    or
+                    #crossing diagonally right to top
+                    (((x1 > self.__Xwmax) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax))) 
+                    and
+                    ((y2 < self.__Ywmin) and
+                    ((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax))))
+
+                    or
+                    #crossing diagonally right to bottom
+                    (((x1 > self.__Xwmax) and
+                    ((y1 >= self.__Ywmin) and (y1 <= self.__Ywmax)))  
+                    and
+                    ((y2 > self.__Ywmax) and
+                    ((x2 >= self.__Xwmin) and (x2 <= self.__Xwmax))))
                     ):
+
                     to_be_Draw.append(obj)
                     break
                     
         self.setObjectsToBeDraw(to_be_Draw)
+                    
     
     def windowTransform(self, coordinates):
 

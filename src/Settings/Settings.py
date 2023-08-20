@@ -8,3 +8,6 @@ class Settings:
     XWMAX = 920
     YWMIN = 0
     YWMAX = 460
+
+    WIDTH = 920
+    HEIGHT = 460
