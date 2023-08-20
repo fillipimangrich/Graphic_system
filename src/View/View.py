@@ -10,6 +10,7 @@ class View():
         self.__line_width = 3
         self.__drawing_object = "Wire Frame"
         self.__points_counter = 0
+        self.__logs = []
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -27,6 +28,12 @@ class View():
             self.__window,bg = "#FFFFFF",height = 460,width = 920,bd = 0,highlightthickness = 0,relief = "ridge")
         self.__view_port.place(x=340, y=20)
         self.__view_port.bind("<Button-1>", self.draw)
+        self.__window.bind("<Left>", self.arrow_key_pressed)
+        self.__window.bind("<Right>", self.arrow_key_pressed)
+        self.__window.bind("<Up>", self.arrow_key_pressed)
+        self.__window.bind("<Down>", self.arrow_key_pressed)
+        self.__window.bind("<MouseWheel>", self.zoom)
+
 
         #TO DO: DRAW THE LINE BASED IN THE POSITION OF THE CURSOR
 
@@ -34,9 +41,21 @@ class View():
 
 
     def setLogOfActionsView(self) -> None:
+        self.log_frame = tk.Frame(self.__window)
+        self.log_frame.place(x=340, y=500, width=920, height=200)
+
+        # Scrollbar
+        self.scroll_y = tk.Scrollbar(self.log_frame, orient="vertical")
+        self.scroll_y.pack(side="right", fill="y")
+
+        # Canvas
         self.__log_actions_view = tk.Canvas(
-            self.__window,bg = "#FFFFFF",height = 200,width = 920,bd = 0,highlightthickness = 0,relief = "ridge")
-        self.__log_actions_view.place(x=340, y=500)
+            self.log_frame, bg="#FFFFFF", bd=0, highlightthickness=0, relief="ridge", yscrollcommand=self.scroll_y.set)
+        self.__log_actions_view.pack(side="left", fill="both", expand=True)
+
+        self.scroll_y.config(command=self.__log_actions_view.yview)
+
+        self.log_y_position = 10
     
     def setListOfObjectsView(self) -> None:
         self.__list_of_objects_view = tk.Canvas(
@@ -65,11 +84,44 @@ class View():
         self.__zoon_out_button = tk.PhotoImage(file =f"src\Images\zoomOut.png")
         button_zoom_out = self.__control.create_image(20, 70, image = self.__zoon_out_button)
         self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: print("zoom") )
-
-    def move(self):
-        self.__controller.moveRight()
-        print("juahgdfuiawghidgiaw")
     
+    def addLogs(self, message: str) -> None:
+        self.__log_actions_view.create_text(10, self.log_y_position, text=message, anchor="w")
+        self.log_y_position += 20
+
+        self.__log_actions_view.config(scrollregion=self.__log_actions_view.bbox("all"))
+        self.__log_actions_view.yview_moveto(1)
+    
+    def update_mesage(self):
+        self._canvas.itemconfig(self.mesage_var, text =self._mensagem)
+    
+    def arrow_key_pressed(self, event):
+        if event.keysym == "Up":
+            self.__controller.moveUp()
+            self.addLogs('Moveu para cima')
+        elif event.keysym == "Down":
+            self.__controller.moveDown()
+            self.addLogs('Moveu para baixo')
+        elif event.keysym == "Left":
+            self.__controller.moveLeft()
+            self.addLogs('Moveu para esquerda')
+        elif event.keysym == "Right":
+            self.__controller.moveRight()
+            self.addLogs('Moveu para direita')
+        
+        self.draw()
+
+    
+    def zoom(self, event):
+        if(event.delta > 0):
+            self.__controller.zoomIn()
+            self.addLogs('ZoomIn')
+        else:
+            self.__controller.zoomOut()
+            self.addLogs('ZoomOut')
+        
+        self.draw()
+
     def setMoveButtons(self) -> None:
         pass
 
@@ -115,11 +167,13 @@ class View():
         elif(self.__drawing_object == 'Wire Frame'):
             if(self.__points_counter == 0):
                 point = Point("ponto", [(event.x, event.y, 0)])
+                self.addLogs('Adicionou ponto - '+ point.getName())
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
@@ -130,6 +184,7 @@ class View():
                 wire_frame = WireFrame("wire frame", points)
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(wire_frame)
+                self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
                 self.__points_counter += 1
 
     def drawPoint(self, color, coordinates):

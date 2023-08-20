@@ -18,11 +18,11 @@ class ViewPort():
             xw = tuple[0]
             yw = tuple[1]
 
-            Xwmin = self.__window.get_xwmin()
-            Xwmax = self.__window.get_xwmax()
+            Xwmin = self.__window.getXwmin()
+            Xwmax = self.__window.getXwmax()
 
-            Ywmin = self.__window.get_Ywmin()
-            Ywmax = self.__window.get_Ywmax()
+            Ywmin = self.__window.getYwmin()
+            Ywmax = self.__window.getYwmax()
 
             xvp = ((xw - Xwmin) / (Xwmax - Xwmin)) * (self.__Xvpmax - self.__Xvpmin)
             yvp = self.__Yvpmin + ((yw - Ywmin) / (Ywmax - Ywmin)) * (self.__Yvpmax - self.__Yvpmin)

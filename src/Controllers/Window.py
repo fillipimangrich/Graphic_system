@@ -8,31 +8,31 @@ class Window():
         self.__Ywmin = 0
         self.__Ywmax = 920
 
-    def get_world(self):
+    def getWorld(self):
         return self.__world
 
-    def get_xwmin(self):
+    def getXwmin(self):
         return self.__Xwmin
     
     def setXwmin(self, Xwmin):
         self.__Xwmin = Xwmin
     
-    def get_xwmax(self):
+    def getXwmax(self):
         return self.__Xwmax
     
     def setXwmax(self, Xwmax):
         self.__Xwmax = Xwmax
     
-    def get_Ywmin(self):
+    def getYwmin(self):
         return self.__Ywmin
     
     def setYwmin(self, Ywmin):
         self.__Ywmin = Ywmin
     
-    def get_Ywmax(self):
+    def getYwmax(self):
         return self.__Ywmax
     
-    def setYwmax(self, Ywmin):
-        self.__Ywmin = Ywmin
+    def setYwmax(self, Ywmax):
+        self.__Ywmax = Ywmax
 
     
