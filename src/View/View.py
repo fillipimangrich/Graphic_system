@@ -175,7 +175,7 @@ class View():
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
-                self.__controller.getListOfObjects().pop()
+                self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
             else:
@@ -183,7 +183,7 @@ class View():
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
                 wire_frame = WireFrame("wire frame", points)
-                self.__controller.getListOfObjects().pop()
+                self.__controller.popWorldObject()
                 self.__controller.addObject(wire_frame)
                 self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
                 self.__points_counter += 1
@@ -213,11 +213,3 @@ class View():
                 x1, y1, z1 = p1
                 x2, y2, z2 = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
-
-
-    def update(self):
-        pass
-
-    def test(self):
-        button1 = tk.Button(text='Get the Square Root', bg='brown', fg='white', font=('helvetica', 9, 'bold'))
-        self.__view_port.create_window(200, 180, window=button1)
