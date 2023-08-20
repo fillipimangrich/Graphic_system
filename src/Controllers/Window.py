@@ -1,4 +1,5 @@
 from src.Controllers.World import World
+from src.Settings.Settings import Settings
 
 class Window():
     def __init__(self):
@@ -34,5 +35,27 @@ class Window():
     
     def setYwmax(self, Ywmax):
         self.__Ywmax = Ywmax
-
     
+    def windowTransform(self, coordinates):
+
+        transformed_coordinates = []
+
+        for tuple in coordinates:
+            x_v = tuple[0]
+            y_v = tuple[1]
+
+            Xwmin = self.getXwmin()
+            Xwmax = self.getXwmax()
+
+            Ywmin = self.getYwmin()
+            Ywmax = self.getYwmax()
+
+            sx = (Settings.XVPMAX - Settings.XVPMIN) / (Xwmax - Xwmin)
+            sy = (Settings.YVPMAX - Settings.XVPMIN) / (Ywmax - Ywmin)
+
+            xw = (x_v - Settings.XVPMIN) / sx + Xwmin
+            yw = (y_v - Settings.YVPMIN) / sy + Ywmin
+
+            transformed_coordinates.append((xw, yw))
+
+        return transformed_coordinates

@@ -10,6 +10,9 @@ class Shape():
     def addNewCoordinate(self, coordinate):
         self.__coordinates.append(coordinate)
 
+    def setCoordinates(self, coordinates):
+        self.__coordinates = coordinates
+
     def getCoordinates(self):
         return self.__coordinates
     

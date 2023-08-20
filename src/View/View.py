@@ -8,7 +8,7 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Line"
+        self.__drawing_object = "Point"
         self.__points_counter = 0
         self.__logs = []
 
@@ -152,6 +152,7 @@ class View():
     def handleWithEvent(self, event):
         if(self.__drawing_object == 'Point'):
             point = Point("ponto", [(event.x, event.y, 0)])
+            self.addLogs('Adicionou ponto - '+ point.getName())
             self.__controller.addObject(point)
         elif(self.__drawing_object == 'Line'):
             if(self.__points_counter == 0):
@@ -161,19 +162,18 @@ class View():
             else:
                 first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(line)
                 self.__points_counter = 0
         elif(self.__drawing_object == 'Wire Frame'):
             if(self.__points_counter == 0):
                 point = Point("ponto", [(event.x, event.y, 0)])
-                self.addLogs('Adicionou ponto - '+ point.getName())
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
-                self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
