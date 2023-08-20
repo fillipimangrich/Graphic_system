@@ -1,10 +1,10 @@
 class Settings:
     XVPMIN = 0
-    XVPMAX = 460
+    XVPMAX = 920
     YVPMIN = 0
-    YVPMAX = 920
+    YVPMAX = 460
     
     XWMIN = 0
-    XWMAX = 460
+    XWMAX = 920
     YWMIN = 0
-    YWMAX = 920
+    YWMAX = 460

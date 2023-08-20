@@ -8,10 +8,11 @@ class Controller():
 
 
     def getListOfObjects(self):
-        return self.__viewport.getWindow().getWorld().getObjects()
+        return self.__viewport.getObjectsToBeDrawTransformed()
 
     def addObject(self, object):
         self.__viewport.getWindow().getWorld().addObject(object)
+        self.__viewport.update()
     
     def getViewport(self):
         return self.__viewport
@@ -19,28 +20,34 @@ class Controller():
     def moveUp(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() - self.__size_of_move)
         self.__viewport.getWindow().setYwmax(self.__viewport.getWindow().getYwmax() - self.__size_of_move)
+        self.__viewport.update()
 
     def moveDown(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() + self.__size_of_move)
         self.__viewport.getWindow().setYwmax(self.__viewport.getWindow().getYwmax() + self.__size_of_move)
+        self.__viewport.update()
     
     def moveRight(self):  
         self.__viewport.getWindow().setXwmin(self.__viewport.getWindow().getXwmin() + self.__size_of_move)
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() + self.__size_of_move)
+        self.__viewport.update()
 
     def moveLeft(self):
         self.__viewport.getWindow().setXwmin(self.__viewport.getWindow().getXwmin() - self.__size_of_move)
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() - self.__size_of_move)
+        self.__viewport.update()
 
     def zoomIn(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() + self.__size_of_move)
         self.__viewport.getWindow().setYwmax(self.__viewport.getWindow().getYwmax() - self.__size_of_move)
         self.__viewport.getWindow().setXwmin(self.__viewport.getWindow().getXwmin() + self.__size_of_move)
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() - self.__size_of_move)
+        self.__viewport.update()
 
     def zoomOut(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() - self.__size_of_move)
         self.__viewport.getWindow().setYwmax(self.__viewport.getWindow().getYwmax() + self.__size_of_move)
         self.__viewport.getWindow().setXwmin(self.__viewport.getWindow().getXwmin() - self.__size_of_move)
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() + self.__size_of_move)
+        self.__viewport.update()
     

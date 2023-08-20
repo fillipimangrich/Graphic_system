@@ -134,19 +134,19 @@ class View():
         self.setViewPort()
         if(event is not None):
             self.handleWithEvent(event)
-
+        
         for obj in self.__controller.getListOfObjects():
+            
             color = obj.getColor()
             coordinates = obj.getCoordinates()
-            transformed_coordinates = self.__controller.getViewport().viewportTransform(coordinates)
             object_type = type(obj)
 
             if object_type == Point:
-                self.drawPoint(color, transformed_coordinates)
+                self.drawPoint(color, coordinates)
             elif object_type == Line:
-                self.drawLine(color, transformed_coordinates)
+                self.drawLine(color, coordinates)
             else:
-                self.drawWireFrame(color, transformed_coordinates)
+                self.drawWireFrame(color, coordinates)
     
 
     def handleWithEvent(self, event):
@@ -154,6 +154,7 @@ class View():
             point = Point("ponto", [(event.x, event.y, 0)])
             self.addLogs('Adicionou ponto - '+ point.getName())
             self.__controller.addObject(point)
+
         elif(self.__drawing_object == 'Line'):
             if(self.__points_counter == 0):
                 point = Point("ponto", [(event.x, event.y, 0)])
@@ -166,6 +167,7 @@ class View():
                 self.__controller.getListOfObjects().pop()
                 self.__controller.addObject(line)
                 self.__points_counter = 0
+
         elif(self.__drawing_object == 'Wire Frame'):
             if(self.__points_counter == 0):
                 point = Point("ponto", [(event.x, event.y, 0)])
@@ -189,13 +191,13 @@ class View():
 
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
-        x, y = p1
+        x, y, z = p1
         self.__view_port.create_oval(x-1, y-1, x+1, y+1, fill=color)
 
     def drawLine(self, color, coordinates):
         p1, p2 = coordinates
-        x1, y1 = p1
-        x2, y2 = p2
+        x1, y1, z1 = p1
+        x2, y2, z2 = p2
         self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawWireFrame(self, color, coordinates):
@@ -203,14 +205,14 @@ class View():
             if (not point == (len(coordinates)-1)):
                 p1 = coordinates[point]
                 p2 = coordinates[point + 1]
-                x1, y1 = p1
-                x2, y2 = p2
+                x1, y1, z1 = p1
+                x2, y2, z2 = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
             else:
                 p1 = coordinates[-1]
                 p2 = coordinates[0]
-                x1, y1 = p1
-                x2, y2 = p2
+                x1, y1, z1 = p1
+                x2, y2, z2 = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
 
