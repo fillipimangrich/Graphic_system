@@ -285,8 +285,7 @@ class View():
                 last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
-                transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
-                wire_frame = WireFrame("wire frame", transformed_points)
+                wire_frame = WireFrame("wire frame", points)
                 self.__controller.popWorldObject()
                 self.__controller.addObject(wire_frame)
                 if(self.__points_counter == 2):
