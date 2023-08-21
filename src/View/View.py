@@ -137,10 +137,11 @@ class View():
         y = self.__list_y_position
 
         canvas_id = self.__list_of_objects_view.create_text(x, y, text=name, anchor="w", tags=(tag,))
-        
+
         self.__object_list_items[tag] = (canvas_id, obj)
 
         self.__list_of_objects_view.tag_bind(canvas_id, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
+
         self.__list_y_position += 20
 
     def onObjectClicked(self, obj):
@@ -172,6 +173,7 @@ class View():
         self.draw()
         popup.destroy()
         self.__list_of_objects_view.update()
+        self.__points_counter = 0
 
     def changeObjectColor(self, obj, popup):
         color_code, color_hex = askcolor(title="Escolha uma cor")
@@ -249,6 +251,7 @@ class View():
         if(self.__drawing_object == 'Point'):
             point = Point("ponto", [(event.x, event.y, 0)])
             self.addLogs('Adicionou ponto - '+ point.getName())
+            self.addObjectToList(point)
             self.__controller.addObject(point)
 
         elif(self.__drawing_object == 'Line'):
@@ -280,10 +283,14 @@ class View():
                 last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
-                wire_frame = WireFrame("wire frame", points)
-                self.__controller.popWorldObject()
-                self.__controller.addObject(wire_frame)
-                self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
+                if(self.__points_counter == 2):
+                    wire_frame = WireFrame("wire frame", points)
+                    self.__controller.popWorldObject()
+                    self.__controller.addObject(wire_frame)
+                    self.addObjectToList(wire_frame)
+                    self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
+                else:
+                    last_object.setCoordinates(points)
                 self.__points_counter += 1
 
     def drawPoint(self, color, coordinates):
