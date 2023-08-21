@@ -186,19 +186,14 @@ class View():
 
     def arrow_key_pressed(self, event):
         if event.keysym == "Up":
-            self.__controller.moveUp()
-            self.addLogs('Moveu para cima')
+            self.moveUp()
         elif event.keysym == "Down":
-            self.__controller.moveDown()
-            self.addLogs('Moveu para baixo')
+            self.moveDown()
         elif event.keysym == "Left":
-            self.__controller.moveLeft()
-            self.addLogs('Moveu para esquerda')
+            self.moveLeft()
         elif event.keysym == "Right":
-            self.__controller.moveRight()
-            self.addLogs('Moveu para direita')
-        
-        self.draw()
+            self.moveRight()
+
 
     def moveUp(self):
         self.__controller.moveUp()
