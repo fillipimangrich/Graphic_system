@@ -135,14 +135,16 @@ class View():
         name = obj.getName()
         x = 10
         y = self.__list_y_position
-
-        canvas_id = self.__list_of_objects_view.create_text(x, y, text=name, anchor="w", tags=(tag,))
+        
+        rectangle = self.__list_of_objects_view.create_rectangle(x,y,x+280,y+20, outline="#000000", fill="#D9D9D9")
+        canvas_id = self.__list_of_objects_view.create_text(150, y+10, text=name, anchor=tk.CENTER, tags=(tag,))
 
         self.__object_list_items[tag] = (canvas_id, obj)
 
-        self.__list_of_objects_view.tag_bind(canvas_id, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
+        self.__list_of_objects_view.tag_bind(rectangle, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
 
-        self.__list_y_position += 20
+
+        self.__list_y_position += 22
 
     def onObjectClicked(self, obj):
         popup = tk.Toplevel()
@@ -233,12 +235,12 @@ class View():
         if(event is not None):
             self.handleWithEvent(event)
         
+        self.__controller.update()
         for obj in self.__controller.getListOfObjects():
-            
             color = obj.getColor()
             coordinates = obj.getCoordinates()
             object_type = type(obj)
-
+            print(obj.getName(), obj.getId(), coordinates)
             if object_type == Point:
                 self.drawPoint(color, coordinates)
             elif object_type == Line:
@@ -252,7 +254,7 @@ class View():
             point = Point("ponto", [(event.x, event.y, 0)])
             self.addLogs('Adicionou ponto - '+ point.getName())
             self.addObjectToList(point)
-            self.__controller.addObject(point)
+            self.__controller.addObject(point)  
 
         elif(self.__drawing_object == 'Line'):
             if(self.__points_counter == 0):
@@ -260,7 +262,7 @@ class View():
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             else:
-                first_point = self.__controller.getListOfObjects()[-1]
+                first_point = self.__controller.getListOfObjectsOfWorld()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
@@ -274,13 +276,13 @@ class View():
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
-                first_point = self.__controller.getListOfObjects()[-1]
+                first_point = self.__controller.getListOfObjectsOfWorld()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
             else:
-                last_object = self.__controller.getListOfObjects()[-1]
+                last_object = self.__controller.getListOfObjectsOfWorld()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
                 if(self.__points_counter == 2):
@@ -290,6 +292,7 @@ class View():
                     self.addObjectToList(wire_frame)
                     self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
                 else:
+                    print(self.__controller.getListOfObjects())
                     last_object.setCoordinates(points)
                 self.__points_counter += 1
 

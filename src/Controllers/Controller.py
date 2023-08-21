@@ -13,6 +13,9 @@ class Controller():
     def getListOfObjects(self): 
         return self.__viewport.getObjectsToBeDrawTransformed()
 
+    def getListOfObjectsOfWorld(self):
+        return self.__viewport.getWindow().getWorld().getObjects()
+    
     def addObject(self, object):
         object.setCoordinates(self.__viewport.getWindow().windowTransform(object.getCoordinates()))
         self.__viewport.getWindow().getWorld().addObject(object)
