@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
 from src.Controllers.Controller import Controller
-from src.shapes.Point import Point
-from src.shapes.Line import Line
-from src.shapes.WireFrame import WireFrame
+from src.Shapes.Point import Point
+from src.Shapes.Line import Line
+from src.Shapes.WireFrame import WireFrame
+
 class View():
     def __init__(self) -> None:
         self.__window = tk.Tk()
@@ -72,7 +73,7 @@ class View():
 
     def setAddObjectButton(self) -> None:
         self.__add_object_button = tk.PhotoImage(file = f"src/Images/add_button.png")
-        button_add = self.__control.create_image(220, 50, image=self.__add_object_button)
+        button_add = self.__control.create_image(230, 50, image=self.__add_object_button)
         self.__control.tag_bind(button_add, "<Button-1>", lambda x: print("Adicionou objeto"))
 
     def setZoomButtons(self) -> None:
@@ -83,7 +84,24 @@ class View():
         self.__zoon_out_button = tk.PhotoImage(file =f"src\Images\zoomOut.png")
         button_zoom_out = self.__control.create_image(20, 70, image = self.__zoon_out_button)
         self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: self.zoom(type('event', (object,), {'delta': 0})()) )
-    
+
+    def setMoveButtons(self) -> None:
+        self.__move_up = tk.PhotoImage(file=f"src/Images/up.png")
+        button_move_up = self.__control.create_image(100, 25, image = self.__move_up)
+        self.__control.tag_bind(button_move_up, "<Button-1>", lambda x: self.moveUp() )
+
+        self.__move_down = tk.PhotoImage(file=f"src/Images/down.png")
+        button_move_down = self.__control.create_image(100, 70, image = self.__move_down)
+        self.__control.tag_bind(button_move_down, "<Button-1>", lambda x: self.moveDown() )
+
+        self.__move_right = tk.PhotoImage(file=f"src/Images/right.png")
+        button_move_right = self.__control.create_image(140, 47, image = self.__move_right)
+        self.__control.tag_bind(button_move_right, "<Button-1>", lambda x: self.moveRight() )
+
+        self.__move_left = tk.PhotoImage(file=f"src\Images\left.png")
+        button_move_left = self.__control.create_image(60, 47, image = self.__move_left)
+        self.__control.tag_bind(button_move_left, "<Button-1>", lambda x: self.moveLeft() )
+
     def addLogs(self, message: str) -> None:
         self.__log_actions_view.create_text(10, self.log_y_position, text=message, anchor="w")
         self.log_y_position += 20
@@ -164,7 +182,26 @@ class View():
         
         self.draw()
 
+    def moveUp(self):
+        self.__controller.moveUp()
+        self.addLogs('Moveu para cima')
+        self.draw()
+
+    def moveDown(self):
+        self.__controller.moveDown()
+        self.addLogs('Moveu para baixo')
+        self.draw()
     
+    def moveLeft(self):
+        self.__controller.moveLeft()
+        self.addLogs('Moveu para esquerda')
+        self.draw()
+    
+    def moveRight(self):
+        self.__controller.moveRight()
+        self.addLogs('Moveu para direita')
+        self.draw()
+
     def zoom(self, event):
         if(event.delta > 0):
             self.__controller.zoomIn()
@@ -175,8 +212,6 @@ class View():
         
         self.draw()
 
-    def setMoveButtons(self) -> None:
-        pass
 
 
     def openViewForAddNewShape(self) -> None:

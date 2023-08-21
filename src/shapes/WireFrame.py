@@ -1,4 +1,4 @@
-from src.shapes.Shape import Shape
+from src.Shapes.Shape import Shape
 
 class WireFrame(Shape):
     def __init__(self, name , coordinates) -> None:
