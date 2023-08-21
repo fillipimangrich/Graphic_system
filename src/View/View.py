@@ -235,7 +235,7 @@ class View():
         if(event is not None):
             self.handleWithEvent(event)
         
-        self.__controller.update()
+        
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
@@ -262,7 +262,7 @@ class View():
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             else:
-                first_point = self.__controller.getListOfObjectsOfWorld()[-1]
+                first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
@@ -276,24 +276,27 @@ class View():
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
-                first_point = self.__controller.getListOfObjectsOfWorld()[-1]
+                first_point = self.__controller.getListOfObjects()[-1]
                 line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
+
+                
             else:
-                last_object = self.__controller.getListOfObjectsOfWorld()[-1]
+                last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
                 if(self.__points_counter == 2):
-                    wire_frame = WireFrame("wire frame", points)
+                    transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
+                    wire_frame = WireFrame("wire frame", transformed_points)
                     self.__controller.popWorldObject()
                     self.__controller.addObject(wire_frame)
                     self.addObjectToList(wire_frame)
                     self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
                 else:
-                    print(self.__controller.getListOfObjects())
-                    last_object.setCoordinates(points)
+                    transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
+                    last_object.setCoordinates(transformed_points)
                 self.__points_counter += 1
 
     def drawPoint(self, color, coordinates):
