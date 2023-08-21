@@ -1,9 +1,10 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
+from tkinter.simpledialog import askstring
 from src.Controllers.Controller import Controller
-from src.Shapes.Point import Point
-from src.Shapes.Line import Line
-from src.Shapes.WireFrame import WireFrame
+from src.shapes.Point import Point
+from src.shapes.Line import Line
+from src.shapes.WireFrame import WireFrame
 
 class View():
     def __init__(self) -> None:
@@ -12,6 +13,7 @@ class View():
         self.__line_width = 3
         self.__drawing_object = "Wire Frame"
         self.__points_counter = 0
+        self.__object_name = "Wireframe 1"
 
     def run(self) -> None:
         self.__window.geometry("1280x720")
@@ -27,6 +29,7 @@ class View():
         self.__drawing_object = drawing_object
         self.__points_counter = 0
         popup.destroy()
+        self.__object_name = askstring("Nome", "Escolha um nome")
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
@@ -195,7 +198,7 @@ class View():
         color_code, color_hex = askcolor(title="Escolha uma cor")
 
         if color_hex:
-            obj.setColor(color_hex)
+            self.__controller.setColorById(obj.getId(), color_hex)
             self.addLogs('Alterou a cor do objeto ' + obj.getName())
             self.__controller.update()
             self.draw()
@@ -254,7 +257,6 @@ class View():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
             object_type = type(obj)
-            print(obj.getName(), obj.getId(), coordinates)
             if object_type == Point:
                 self.drawPoint(color, coordinates)
             elif object_type == Line:
@@ -265,19 +267,19 @@ class View():
 
     def handleWithEvent(self, event):
         if(self.__drawing_object == 'Point'):
-            point = Point("ponto", [(event.x, event.y, 0)])
+            point = Point(self.__object_name, [(event.x, event.y, 0)])
             self.addLogs('Adicionou ponto - '+ point.getName())
             self.addObjectToList(point)
             self.__controller.addObject(point)  
 
         elif(self.__drawing_object == 'Line'):
             if(self.__points_counter == 0):
-                point = Point("ponto", [(event.x, event.y, 0)])
+                point = Point(self.__object_name, [(event.x, event.y, 0)])
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             else:
                 first_point = self.__controller.getListOfObjects()[-1]
-                line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
@@ -286,12 +288,12 @@ class View():
 
         elif(self.__drawing_object == 'Wire Frame'):
             if(self.__points_counter == 0):
-                point = Point("ponto", [(event.x, event.y, 0)])
+                point = Point(self.__object_name, [(event.x, event.y, 0)])
                 self.__controller.addObject(point)
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
-                line = Line("linha", [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
@@ -299,7 +301,8 @@ class View():
                 last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
-                wire_frame = WireFrame("wire frame", points)
+                wire_frame = WireFrame(self.__object_name, points)
+                wire_frame.setId(last_object.getId())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(wire_frame)
                 if(self.__points_counter == 2):

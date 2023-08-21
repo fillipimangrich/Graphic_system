@@ -33,6 +33,10 @@ class Controller():
     
     def update(self):
         self.__viewport.update()
+
+    def setColorById(self, id, color):
+        obj = self.__viewport.getWindow().getWorld().getObjectById(id)
+        obj.setColor(color)
     
     def moveUp(self):
         self.__viewport.getWindow().setYwmin(self.__viewport.getWindow().getYwmin() - (self.__size_of_move))

@@ -13,11 +13,13 @@ class Shape():
         self.__coordinates.append(coordinate)
 
     def setCoordinates(self, coordinates):
-        print(coordinates)
         self.__coordinates = coordinates
     
     def getId(self):
         return self.__id
+    
+    def setId(self, id):
+        self.__id = id
 
     def getCoordinates(self):
         return self.__coordinates
