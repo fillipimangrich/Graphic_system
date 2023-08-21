@@ -61,11 +61,22 @@ class View():
         self.log_y_position = 10
     
     def setListOfObjectsView(self) -> None:
+
+        frame = tk.Frame(self.__window)
+        frame.grid(padx=20, pady=20, row=0, column=0)
+
         self.__list_of_objects_view = tk.Canvas(
-        self.__window,bg = "#FFFFFF",height = 240,width = 300,bd = 0,highlightthickness = 0,relief = "ridge")
-        self.__list_of_objects_view.place(x=20, y=20)
+            frame, bg="#FFFFFF", height=240, width=280, bd=0, highlightthickness=0, relief="ridge")
+        self.__list_of_objects_view.pack(side="left", fill="y")
+
+        scroll_y = tk.Scrollbar(frame, orient="vertical", command=self.__list_of_objects_view.yview)
+        scroll_y.pack(side="right", fill="y")
+
+        self.__list_of_objects_view.configure(yscrollcommand=scroll_y.set)
+
         self.__object_list_items = {}
         self.__list_y_position = 10
+
 
     def setControlView(self) -> None:
         self.__control = tk.Canvas(
@@ -134,9 +145,9 @@ class View():
         tag = obj.getId()
         name = obj.getName()
         x = 10
-        y = self.__list_y_position
+        y = self.__list_y_position 
         
-        rectangle = self.__list_of_objects_view.create_rectangle(x,y,x+280,y+20, outline="#000000", fill="#D9D9D9")
+        rectangle = self.__list_of_objects_view.create_rectangle(x,y,x+260,y+20, outline="#000000", fill="#D9D9D9")
         canvas_id = self.__list_of_objects_view.create_text(150, y+10, text=name, anchor=tk.CENTER, tags=(tag,))
 
         self.__object_list_items[tag] = (canvas_id, obj)
@@ -145,6 +156,9 @@ class View():
         self.__list_of_objects_view.tag_bind(rectangle, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
 
         self.__list_y_position += 22
+
+        self.__list_of_objects_view.config(scrollregion=self.__list_of_objects_view.bbox("all"))
+        self.__list_of_objects_view.yview_moveto(1)
 
     def onObjectClicked(self, obj):
         popup = tk.Toplevel()
