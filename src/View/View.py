@@ -10,7 +10,7 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Line"
+        self.__drawing_object = "Wire Frame"
         self.__points_counter = 0
 
     def run(self) -> None:
@@ -22,7 +22,11 @@ class View():
         self.setControlView()
         self.setAddObjectButton()
         self.__window.mainloop()
-        
+    
+    def setDrawingObject(self, drawing_object, popup):
+        self.__drawing_object = drawing_object
+        self.__points_counter = 0
+        popup.destroy()
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
@@ -74,8 +78,22 @@ class View():
     def setAddObjectButton(self) -> None:
         self.__add_object_button = tk.PhotoImage(file = f"src/Images/add_button.png")
         button_add = self.__control.create_image(230, 50, image=self.__add_object_button)
-        self.__control.tag_bind(button_add, "<Button-1>", lambda x: print("Adicionou objeto"))
+        self.__control.tag_bind(button_add, "<Button-1>", lambda x: self.openViewForAddNewShape())
 
+    def openViewForAddNewShape(self) -> None:
+        popup = tk.Toplevel()
+        popup.title("Opções")
+
+        point_button = tk.Button(popup, text="Ponto", command=lambda: self.setDrawingObject("Point", popup))
+        point_button.pack(pady=10)
+
+        line_button = tk.Button(popup, text="Reta", command=lambda: self.setDrawingObject("Line", popup))
+        line_button.pack(pady=10)
+
+        wire_frame_button = tk.Button(popup, text="Wire Frame", command=lambda: self.setDrawingObject("Wire Frame", popup))
+        wire_frame_button.pack(pady=10)
+
+        
     def setZoomButtons(self) -> None:
         self.__zoom_in_button = tk.PhotoImage(file=f"src\Images\zoomIn.png")
         button_zoom_in = self.__control.create_image(20, 25, image = self.__zoom_in_button)
@@ -213,11 +231,6 @@ class View():
         self.draw()
 
 
-
-    def openViewForAddNewShape(self) -> None:
-        pass
-    
-
     def draw(self, event=None):
         self.setViewPort()
         if(event is not None):
@@ -281,7 +294,7 @@ class View():
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
         x, y, z = p1
-        self.__view_port.create_oval(x-1, y-1, x+1, y+1, fill=color)
+        self.__view_port.create_oval(x-2, y-2, x+2, y+2, fill=color)
 
     def drawLine(self, color, coordinates):
         p1, p2 = coordinates
