@@ -141,8 +141,8 @@ class View():
 
         self.__object_list_items[tag] = (canvas_id, obj)
 
+        self.__list_of_objects_view.tag_bind(canvas_id, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
         self.__list_of_objects_view.tag_bind(rectangle, "<Button-1>", lambda event, obj=obj: self.onObjectClicked(obj))
-
 
         self.__list_y_position += 22
 
