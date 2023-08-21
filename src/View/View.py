@@ -281,22 +281,18 @@ class View():
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
-
-                
             else:
                 last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
+                transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
+                wire_frame = WireFrame("wire frame", transformed_points)
+                self.__controller.popWorldObject()
+                self.__controller.addObject(wire_frame)
                 if(self.__points_counter == 2):
-                    transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
-                    wire_frame = WireFrame("wire frame", transformed_points)
-                    self.__controller.popWorldObject()
-                    self.__controller.addObject(wire_frame)
                     self.addObjectToList(wire_frame)
                     self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
-                else:
-                    transformed_points = self.__controller.getViewport().getWindow().windowTransform(points)
-                    last_object.setCoordinates(transformed_points)
+                
                 self.__points_counter += 1
 
     def drawPoint(self, color, coordinates):
