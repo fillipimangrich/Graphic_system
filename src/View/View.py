@@ -11,7 +11,7 @@ class View():
         self.__window = tk.Tk()
         self.__controller = Controller()
         self.__line_width = 3
-        self.__drawing_object = "Wire Frame"
+        self.__drawing_object = "Point"
         self.__points_counter = 0
         self.__object_name = "Wireframe 1"
 
@@ -29,7 +29,6 @@ class View():
         self.__drawing_object = drawing_object
         self.__points_counter = 0
         popup.destroy()
-        self.__object_name = askstring("Nome", "Escolha um nome")
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
@@ -267,6 +266,7 @@ class View():
 
     def handleWithEvent(self, event):
         if(self.__drawing_object == 'Point'):
+            self.__object_name = askstring("Nome","Digite o nome")
             point = Point(self.__object_name, [(event.x, event.y, 0)])
             self.addLogs('Adicionou ponto - '+ point.getName())
             self.addObjectToList(point)
@@ -279,6 +279,7 @@ class View():
                 self.__points_counter += 1
             else:
                 first_point = self.__controller.getListOfObjects()[-1]
+                self.__object_name = askstring("Nome","Digite o nome")
                 line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x,event.y,0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
@@ -301,6 +302,8 @@ class View():
                 last_object = self.__controller.getListOfObjects()[-1]
                 points = [x for x in last_object.getCoordinates()]
                 points.append((event.x,event.y,0))
+                if(self.__points_counter == 2):
+                    self.__object_name = askstring("Nome","Digite o nome")
                 wire_frame = WireFrame(self.__object_name, points)
                 wire_frame.setId(last_object.getId())
                 self.__controller.popWorldObject()
