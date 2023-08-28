@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter.colorchooser import askcolor
+from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
@@ -108,11 +109,11 @@ class View():
 
         
     def setZoomButtons(self) -> None:
-        self.__zoom_in_button = tk.PhotoImage(file=f"src\Images\zoomIn.png")
+        self.__zoom_in_button = tk.PhotoImage(file=f"src/Images/zoomIn.png")
         button_zoom_in = self.__control.create_image(20, 25, image = self.__zoom_in_button)
         self.__control.tag_bind(button_zoom_in, "<Button-1>", lambda x: self.zoom(type('event', (object,), {'delta': 1})()))
         
-        self.__zoon_out_button = tk.PhotoImage(file =f"src\Images\zoomOut.png")
+        self.__zoon_out_button = tk.PhotoImage(file =f"src/Images/zoomOut.png")
         button_zoom_out = self.__control.create_image(20, 70, image = self.__zoon_out_button)
         self.__control.tag_bind(button_zoom_out, "<Button-1>", lambda x: self.zoom(type('event', (object,), {'delta': 0})()) )
 
@@ -129,7 +130,7 @@ class View():
         button_move_right = self.__control.create_image(140, 47, image = self.__move_right)
         self.__control.tag_bind(button_move_right, "<Button-1>", lambda x: self.moveRight() )
 
-        self.__move_left = tk.PhotoImage(file=f"src\Images\left.png")
+        self.__move_left = tk.PhotoImage(file=f"src/Images/left.png")
         button_move_left = self.__control.create_image(60, 47, image = self.__move_left)
         self.__control.tag_bind(button_move_left, "<Button-1>", lambda x: self.moveLeft() )
 
@@ -304,6 +305,7 @@ class View():
                 points.append((event.x,event.y,0))
                 if(self.__points_counter == 2):
                     self.__object_name = askstring("Nome","Digite o nome")
+                    showinfo("Info", "Agora você pode continuar adicionando pontos para o seu Wireframe")
                 wire_frame = WireFrame(self.__object_name, points)
                 wire_frame.setId(last_object.getId())
                 self.__controller.popWorldObject()
