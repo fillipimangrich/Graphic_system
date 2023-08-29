@@ -60,7 +60,6 @@ class MatrixHelper():
     
 
     def calculateScaleMatrix(obj, sx, sy, sz):
-        print('entrou aqui')
         scale_matrix = MatrixHelper.getScaleMatrix(sx, sy, sz)
         center = obj.calcObjectCenter()
 

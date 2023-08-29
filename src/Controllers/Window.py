@@ -142,12 +142,12 @@ class Window():
 
             Ywmin = self.getYwmin()
             Ywmax = self.getYwmax()
+            
+            multx = Settings.XVPMAX - Settings.XVPMIN
+            multy = Settings.YVPMAX - Settings.YVPMIN
 
-            sx = (Settings.XVPMAX - Settings.XVPMIN) / (Xwmax - Xwmin)
-            sy = (Settings.YVPMAX - Settings.XVPMIN) / (Ywmax - Ywmin)
-
-            xw = (x_v - Settings.XVPMIN) / sx + Xwmin
-            yw = (y_v - Settings.YVPMIN) / sy + Ywmin
+            xw = Xwmin + (x_v - Settings.XVPMIN) / multx * (Xwmax - Xwmin)
+            yw = Ywmin + (1 - (y_v - Settings.XVPMIN) / multy) * (Ywmax - Ywmin)
 
             transformed_coordinates.append((xw, yw, z_v, w_v))
 

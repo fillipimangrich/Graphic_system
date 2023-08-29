@@ -1,4 +1,5 @@
 import copy
+from src.Settings.Settings import Settings
 from src.Controllers.Window import Window
 
 class ViewPort():
@@ -35,8 +36,10 @@ class ViewPort():
         transformed_coordinates = []
 
         for tuple in coordinates:
-            xw = tuple[0]
-            yw = tuple[1]
+            x_v = tuple[0]
+            y_v = tuple[1]
+            z_v = tuple[2]
+            w_v = tuple[3]
 
             Xwmin = self.__window.getXwmin()
             Xwmax = self.__window.getXwmax()
@@ -44,12 +47,12 @@ class ViewPort():
             Ywmin = self.__window.getYwmin()
             Ywmax = self.__window.getYwmax()
 
-            sx = (self.__Xvpmax - self.__Xvpmin) / (Xwmax - Xwmin)
-            sy = (self.__Yvpmax - self.__Yvpmin) / (Ywmax - Ywmin)
-        
-            xvp = self.__Xvpmin + ((xw - Xwmin) * sx)
-            yvp = self.__Yvpmin + ((yw - Ywmin) * sy)
+            xvp = (x_v - Xwmin) / (Xwmax - Xwmin)
+            xvp *= (Settings.XVPMAX - Settings.XVPMIN)
 
-            transformed_coordinates.append((xvp, yvp, 0))
+            yvp = 1 - (y_v - Ywmin) / (Ywmax - Ywmin)
+            yvp *= (Settings.YVPMAX - Settings.YVPMIN)
+
+            transformed_coordinates.append((round(xvp), round(yvp), z_v, w_v))
 
         return transformed_coordinates
