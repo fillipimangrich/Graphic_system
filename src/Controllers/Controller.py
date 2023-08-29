@@ -1,3 +1,4 @@
+from src.shapes.Shape import Shape
 from src.Controllers.OperationHandler import OperationHandler
 from src.Controllers.ViewPort import ViewPort
 from src.Settings.Settings import Settings
@@ -12,15 +13,14 @@ class Controller():
         self.__scale = 0.1
         
 
-
     def getListOfObjects(self): 
         return self.__viewport.getObjectsToBeDrawTransformed()
 
     def getListOfObjectsOfWorld(self):
         return self.__viewport.getWindow().getWorld().getObjects()
     
-    def addObject(self, object):
-        object.setCoordinates(self.__viewport.getWindow().windowTransform(object.getCoordinates()))
+    def addObject(self, object : Shape):
+        object.setCoordinates(self.__viewport.getWindow().windowTransform(object.getCoordinates())) 
         self.__viewport.getWindow().getWorld().addObject(object)
         self.__viewport.update()
 
@@ -75,10 +75,9 @@ class Controller():
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() + (self.__scale * Settings.WIDTH))
         self.__viewport.update()
 
-    def applyTransformations(self, transf_list, object):
-        matrices = MatrixHelper.parseTransformationList(transf_list)
+    def applyTransformations(self, transf_list, object : Shape):
+        matrices = MatrixHelper.parseTransformationList(object, transf_list)
         transf_matrix = MatrixHelper.calculateTransformationMatrix(matrices)
         object.transform(transf_matrix)
-
         self.__viewport.update()
     

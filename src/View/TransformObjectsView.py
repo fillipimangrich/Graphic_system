@@ -7,7 +7,7 @@ from src.View.TransformationList import TransformationList
 from src.View.TransformTabMenu import TransformTabMenu
 
 class TransformObjectsView(tk.Toplevel):
-    def __init__(self, master, controller, object):
+    def __init__(self, master, controller, object, on_close_callback):
         super().__init__(master)
         self.controller = controller
         self.title("Transform Object: " + object.getName())
@@ -15,6 +15,7 @@ class TransformObjectsView(tk.Toplevel):
         self.transformation_list = []
         self.tab_menu = TransformTabMenu(self)    
         self.object = object
+        self.on_close_callback = on_close_callback
         
         # Create the object list bar
         self.transf_list = TransformationList(self, controller,  self.transformation_list)
@@ -32,11 +33,14 @@ class TransformObjectsView(tk.Toplevel):
         self.tab_menu.grid(row=2, columnspan=1, pady = 20, padx=10)
 
         
-        apply_button = tk.Button(self, text="Apply Tranformations", font=("Arial", 10), command=self.apply_transformations)
+        apply_button = tk.Button(self, text="Apply Tranformations", font=("Arial", 10), command=self.applyTransformations)
         apply_button.grid(row=6,pady=5, padx=3)
-        
-    def apply_transformations(self):
-        self.controller.apply_transformations(self.transformation_list, self.object)
+
+
+    def applyTransformations(self):
+        self.controller.applyTransformations(self.transformation_list, self.object)
+        self.destroy()
+        self.on_close_callback()
        
     def add_translation(self, Dx,Dy,Dz, type):
         self.transformation_list.append([Dx, Dy,Dz, type])

@@ -52,14 +52,14 @@ class Window():
                 if (not point == (len(coordinates)-1)):
                     p1 = coordinates[point]
                     p2 = coordinates[point + 1]
-                    x1, y1, z1 = p1
-                    x2, y2, z2 = p2
+                    x1, y1, z1, w = p1
+                    x2, y2, z2, w = p2
                     
                 else:
                     p1 = coordinates[-1]
                     p2 = coordinates[0]
-                    x1, y1, z1 = p1
-                    x2, y2, z2 = p2
+                    x1, y1, z1, w = p1
+                    x2, y2, z2, w = p2
                 
                 if(
                     #Point one inside
@@ -134,6 +134,8 @@ class Window():
         for tuple in coordinates:
             x_v = tuple[0]
             y_v = tuple[1]
+            z_v = tuple[2]
+            w_v = tuple[3]
 
             Xwmin = self.getXwmin()
             Xwmax = self.getXwmax()
@@ -147,6 +149,6 @@ class Window():
             xw = (x_v - Settings.XVPMIN) / sx + Xwmin
             yw = (y_v - Settings.YVPMIN) / sy + Ywmin
 
-            transformed_coordinates.append((xw, yw, 0))
+            transformed_coordinates.append((xw, yw, z_v, w_v))
 
         return transformed_coordinates

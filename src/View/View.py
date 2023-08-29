@@ -211,7 +211,7 @@ class View(tk.Tk):
         popup.destroy()
 
     def transformObject(self, obj, popup):
-        self.transform_object_window = TransformObjectsView(self, self.__controller, obj)
+        self.transform_object_window = TransformObjectsView(self, self.__controller, obj, self.draw)
         popup.destroy()
 
     def arrow_key_pressed(self, event):
@@ -260,8 +260,7 @@ class View(tk.Tk):
         self.setViewPort()
         if(event is not None):
             self.handleWithEvent(event)
-        
-        
+
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
@@ -290,7 +289,7 @@ class View(tk.Tk):
             else:
                 first_point = self.__controller.getListOfObjects()[-1]
                 self.__object_name = askstring("Nome","Digite o nome")
-                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 0)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
@@ -304,7 +303,7 @@ class View(tk.Tk):
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
-                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x,event.y,0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 0)])
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
@@ -327,13 +326,13 @@ class View(tk.Tk):
 
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
-        x, y, z = p1
+        x, y, z, w = p1
         self.__view_port.create_oval(x-2, y-2, x+2, y+2, fill=color)
 
     def drawLine(self, color, coordinates):
         p1, p2 = coordinates
-        x1, y1, z1 = p1
-        x2, y2, z2 = p2
+        x1, y1, z1, w = p1
+        x2, y2, z2, w = p2
         self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawWireFrame(self, color, coordinates):
@@ -341,12 +340,12 @@ class View(tk.Tk):
             if (not point == (len(coordinates)-1)):
                 p1 = coordinates[point]
                 p2 = coordinates[point + 1]
-                x1, y1, z1 = p1
-                x2, y2, z2 = p2
+                x1, y1, z1, w = p1
+                x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
             else:
                 p1 = coordinates[-1]
                 p2 = coordinates[0]
-                x1, y1, z1 = p1
-                x2, y2, z2 = p2
+                x1, y1, z1, w = p1
+                x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
