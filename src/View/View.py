@@ -6,10 +6,12 @@ from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
 from src.shapes.Line import Line
 from src.shapes.WireFrame import WireFrame
+from src.Helpers.MatrixHelper import MatrixHelper
+from src.View.TransformObjectsView import TransformObjectsView
 
-class View():
+class View(tk.Tk):
     def __init__(self) -> None:
-        self.__window = tk.Tk()
+        super().__init__()
         self.__controller = Controller()
         self.__line_width = 3
         self.__drawing_object = "Point"
@@ -17,14 +19,14 @@ class View():
         self.__object_name = "Wireframe 1"
 
     def run(self) -> None:
-        self.__window.geometry("1280x720")
-        self.__window.configure(bg = "#2D2D2D")
+        self.geometry("1280x720")
+        self.configure(bg = "#2D2D2D")
         self.setViewPort()
         self.setLogOfActionsView()
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
-        self.__window.mainloop()
+        self.mainloop()
     
     def setDrawingObject(self, drawing_object, popup):
         self.__drawing_object = drawing_object
@@ -33,14 +35,14 @@ class View():
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
-            self.__window,bg = "#FFFFFF",height = 460,width = 920,bd = 0,highlightthickness = 0,relief = "ridge")
+            self,bg = "#FFFFFF",height = 460,width = 920,bd = 0,highlightthickness = 0,relief = "ridge")
         self.__view_port.place(x=340, y=20)
         self.__view_port.bind("<Button-1>", self.draw)
-        self.__window.bind("<Left>", self.arrow_key_pressed)
-        self.__window.bind("<Right>", self.arrow_key_pressed)
-        self.__window.bind("<Up>", self.arrow_key_pressed)
-        self.__window.bind("<Down>", self.arrow_key_pressed)
-        self.__window.bind("<MouseWheel>", self.zoom)
+        self.bind("<Left>", self.arrow_key_pressed)
+        self.bind("<Right>", self.arrow_key_pressed)
+        self.bind("<Up>", self.arrow_key_pressed)
+        self.bind("<Down>", self.arrow_key_pressed)
+        self.bind("<MouseWheel>", self.zoom)
 
 
         #TO DO: DRAW THE LINE BASED IN THE POSITION OF THE CURSOR
@@ -49,7 +51,7 @@ class View():
 
 
     def setLogOfActionsView(self) -> None:
-        self.log_frame = tk.Frame(self.__window)
+        self.log_frame = tk.Frame(self)
         self.log_frame.place(x=340, y=500, width=920, height=200)
 
         self.scroll_y = tk.Scrollbar(self.log_frame, orient="vertical")
@@ -65,7 +67,7 @@ class View():
     
     def setListOfObjectsView(self) -> None:
 
-        frame = tk.Frame(self.__window)
+        frame = tk.Frame(self)
         frame.grid(padx=20, pady=20, row=0, column=0)
 
         self.__list_of_objects_view = tk.Canvas(
@@ -83,7 +85,7 @@ class View():
 
     def setControlView(self) -> None:
         self.__control = tk.Canvas(
-            self.__window,bg = "#565656",height = 420,width = 300,bd = 0,highlightthickness = 0,relief = "ridge")
+            self,bg = "#565656",height = 420,width = 300,bd = 0,highlightthickness = 0,relief = "ridge")
         self.__control.place(x=20, y=280)
         self.setAddObjectButton()
         self.setZoomButtons()
@@ -173,6 +175,9 @@ class View():
         color_button = tk.Button(popup, text="Trocar Cor", command=lambda: self.changeObjectColor(obj, popup))
         color_button.pack(pady=10)
 
+        transformation_button = tk.Button(popup, text="Transformar", command=lambda: self.transformObject(obj, popup))
+        transformation_button.pack(pady=10)
+
     def redrawObjectList(self):
         self.__list_of_objects_view.delete("all")
 
@@ -203,6 +208,10 @@ class View():
             self.__controller.update()
             self.draw()
 
+        popup.destroy()
+
+    def transformObject(self, obj, popup):
+        self.transform_object_window = TransformObjectsView(self, self.__controller, obj)
         popup.destroy()
 
     def arrow_key_pressed(self, event):
