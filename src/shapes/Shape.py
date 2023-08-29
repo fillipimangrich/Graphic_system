@@ -1,5 +1,6 @@
 from abc import ABC
 import random
+import numpy as np
 
 class Shape():
     def __init__(self, name, coordinates, color='#000000') -> None:
@@ -41,3 +42,8 @@ class Shape():
     
     def setColor(self, color):
         self.__color = color
+    
+    def calcObjectCenter(self):
+        points = self.getCoordinates()
+        center = np.mean(points, axis=0)
+        return center

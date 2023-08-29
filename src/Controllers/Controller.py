@@ -1,6 +1,9 @@
 from src.Controllers.OperationHandler import OperationHandler
 from src.Controllers.ViewPort import ViewPort
 from src.Settings.Settings import Settings
+from src.Helpers.MatrixHelper import MatrixHelper
+
+
 class Controller():
     def __init__(self):
         self.__operantion_handler = OperationHandler()
@@ -70,5 +73,12 @@ class Controller():
         self.__viewport.getWindow().setYwmax(self.__viewport.getWindow().getYwmax() + (self.__scale * Settings.HEIGHT))
         self.__viewport.getWindow().setXwmin(self.__viewport.getWindow().getXwmin() - (self.__scale * Settings.WIDTH))
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() + (self.__scale * Settings.WIDTH))
+        self.__viewport.update()
+
+    def applyTransformations(self, transf_list, object):
+        matrices = MatrixHelper.parseTransformationList(transf_list)
+        transf_matrix = MatrixHelper.calculateTransformationMatrix(matrices)
+        object.transform(transf_matrix)
+
         self.__viewport.update()
     
