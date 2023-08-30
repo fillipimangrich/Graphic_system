@@ -38,7 +38,7 @@ class TransformObjectsView(tk.Toplevel):
 
 
     def applyTransformations(self):
-        self.controller.applyTransformations(self.transformation_list, self.object)
+        self.controller.applyTransformations(self.transformation_list, self.object.getId())
         self.destroy()
         self.on_close_callback()
        

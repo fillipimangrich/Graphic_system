@@ -75,9 +75,10 @@ class Controller():
         self.__viewport.getWindow().setXwmax(self.__viewport.getWindow().getXwmax() + (self.__scale * Settings.WIDTH))
         self.__viewport.update()
 
-    def applyTransformations(self, transf_list, object : Shape):
-        matrices = MatrixHelper.parseTransformationList(object, transf_list)
+    def applyTransformations(self, transf_list, objectId):
+        obj = self.__viewport.getWindow().getWorld().getObjectById(objectId)
+        matrices = MatrixHelper.parseTransformationList(obj, transf_list)
         transf_matrix = MatrixHelper.calculateTransformationMatrix(matrices)
-        object.transform(transf_matrix)
+        obj.transform(transf_matrix)
         self.__viewport.update()
     
