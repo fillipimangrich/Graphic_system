@@ -127,6 +127,7 @@ class Shape():
         elif axis == "z":
             vector = self.__axis[2].copy() - center
         else:
+            axis = np.append(axis, 1)
             vector = np.asarray(axis) - center
             vector = np.append(vector, 0)
 

@@ -318,7 +318,6 @@ class View(tk.Tk):
                 wire_frame.setId(last_object.getId())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(wire_frame)
-                print('adicionou objeto')
                 if(self.__points_counter == 2):
                     self.addObjectToList(wire_frame)
                     self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
@@ -337,7 +336,6 @@ class View(tk.Tk):
         self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawWireFrame(self, color, coordinates):
-        print(coordinates)
         for point in range(len(coordinates)):
             if (not point == (len(coordinates)-1)):
                 p1 = coordinates[point]

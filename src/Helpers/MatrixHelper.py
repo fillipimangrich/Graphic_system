@@ -6,36 +6,34 @@ from src.shapes.Shape import Shape
 
 class MatrixHelper():
     def getRotationMatrix(angle, axis):
-        a_cos = math.cos(angle)
-        a_sin = math.sin(angle)
         if axis == "x" or axis == (1, 0, 0):
             return np.array(
                 [
-                    [1, 0, 0, 0],
-                    [0, a_cos, a_sin, 0],
-                    [0, -a_sin, a_cos, 0],
-                    [0, 0, 0, 1],
+                    [math.cos(angle), -math.sin(angle), 0, 0],
+                    [math.sin(angle), math.cos(angle), 0, 0],
+                    [0, 0, 1, 0],
+                    [0, 0, 0, 1]
                 ]
             )
         elif axis == "y" or axis == (0, 1, 0):
+            angle = angle + 90
             return np.array(
                 [
-                    [a_cos, 0, -a_sin, 0],
-                    [0, 1, 0, 0],
-                    [a_sin, 0, a_cos, 0],
-                    [0, 0, 0, 1],
+                    [math.cos(angle), -math.sin(angle), 0, 0],
+                    [math.sin(angle), math.cos(angle), 0, 0],
+                    [0, 0, 1, 0],
+                    [0, 0, 0, 1]
                 ]
             )
         elif axis == "z" or axis == (0, 0, 1):
             return np.array(
                 [
-                    [a_cos, a_sin, 0, 0],
-                    [-a_sin, a_cos, 0, 0],
+                    [math.cos(angle), math.sin(angle), 0, 0],
+                    [-math.sin(angle), math.cos(angle), 0, 0],
                     [0, 0, 1, 0],
-                    [0, 0, 0, 1],
+                    [0, 0, 0, 1]
                 ]
             )
-
 
     def getScaleMatrix(sx, sy, sz):
         scale_matrix = np.array(
