@@ -7,7 +7,9 @@ from src.shapes.Point import Point
 from src.shapes.Line import Line
 from src.shapes.WireFrame import WireFrame
 from src.Helpers.MatrixHelper import MatrixHelper
+from src.Helpers.DescritorOBJ import DescritorOBJ
 from src.View.TransformObjectsView import TransformObjectsView
+
 
 class View(tk.Tk):
     def __init__(self) -> None:
@@ -26,6 +28,15 @@ class View(tk.Tk):
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
+        
+        # teste
+        self.descriptor = DescritorOBJ()
+        name, points = self.descriptor.parseOBJ("src/Test/teapot.obj")
+        wire_frame = WireFrame(name, points)
+        self.__controller.addObject(wire_frame)
+        self.addObjectToList(wire_frame)
+       
+
         self.mainloop()
     
     def setDrawingObject(self, drawing_object, popup):
