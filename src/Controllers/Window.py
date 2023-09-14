@@ -1,10 +1,22 @@
+from src.Helpers.MatrixHelper import MatrixHelper
+from src.shapes.Shape import Shape
 from src.Controllers.World import World
 from src.Settings.Settings import Settings
+import numpy as np
 
-class Window():
+WINDOW_COORDINATES = [
+    (0, 0, 0, 1),
+    (0, 460, 0, 1),
+    (920, 460, 0, 1),
+    (920, 0, 0, 1),
+]
+
+class Window(Shape):
     def __init__(self):
+        super().__init__(name="window", coordinates=WINDOW_COORDINATES)
         self.__world = World()
         self.__objects_to_be_draw = []
+        self.__size = [920, 460]
         self.__Xwmin = 0
         self.__Xwmax = 920
         self.__Ywmin = 0
@@ -129,7 +141,6 @@ class Window():
                     
     
     def windowTransform(self, coordinates):
-
         transformed_coordinates = []
 
         for tuple in coordinates:
@@ -153,3 +164,8 @@ class Window():
             transformed_coordinates.append((xw, yw, z_v, w_v))
 
         return transformed_coordinates
+
+    def rotate(self, angle, axis):
+        angle = np.radians(angle)
+        matrix = MatrixHelper.calculateRotationMatrix(self, angle, axis)
+        self.transform(matrix)

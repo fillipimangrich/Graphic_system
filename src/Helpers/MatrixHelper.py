@@ -1,11 +1,53 @@
 import numpy as np
 import math
+from functools import reduce
 
 from src.shapes.Shape import Shape
 
 
 class MatrixHelper():
-    def getRotationMatrix(angle, axis):
+
+    def getRotationMatrix(dX, dY, dZ):
+        """
+        Build rotation matrix as composition from:
+
+        Rx = [1  0       0       0]
+            [0  cos(dX) sen(dX) 0]
+            [0 -sen(dX) cos(dX) 0]
+            [0  0       0       1]
+
+        Ry = [cos(dY) 0 -sen(dY) 0]
+            [0       1 0        0]
+            [sen(dY) 0 cos(dY)  0]
+            [0       0 0        1]
+
+        Rz = [cos(dZ)  sen(dZ) 0 0]
+            [-sen(dZ) cos(dZ) 0 0]
+            [0        0       1 0]
+            [0        0       0 1]
+        """
+        Rx = np.identity(4)
+        Rx[1][1] = np.cos(np.deg2rad(dX))
+        Rx[1][2] = np.sin(np.deg2rad(dX))
+        Rx[2][1] = -np.sin(np.deg2rad(dX))
+        Rx[2][2] = np.cos(np.deg2rad(dX))
+
+        Ry = np.identity(4)
+        Ry[0][0] = np.cos(np.deg2rad(dY))
+        Ry[0][2] = -np.sin(np.deg2rad(dY))
+        Ry[2][0] = np.sin(np.deg2rad(dY))
+        Ry[2][2] = np.cos(np.deg2rad(dY))
+
+        Rz = np.identity(4)
+        Rz[0][0] = np.cos(np.deg2rad(dZ))
+        Rz[0][1] = np.sin(np.deg2rad(dZ))
+        Rz[1][0] = -np.sin(np.deg2rad(dZ))
+        Rz[1][1] = np.cos(np.deg2rad(dZ))
+
+        return reduce(np.dot, [Rx, Ry, Rz])
+
+
+    def getRotationMatrixByAngleAndAxis(angle, axis):
         if axis == "x" or axis == (1, 0, 0):
             return np.array(
                 [
@@ -34,6 +76,7 @@ class MatrixHelper():
                     [0, 0, 0, 1]
                 ]
             )
+
 
     def getScaleMatrix(sx, sy, sz):
         scale_matrix = np.array(
@@ -81,13 +124,13 @@ class MatrixHelper():
 
         beta_on_xy = obj.getBetaOnXy(vector.copy())
 
-        rotate_to_xy = MatrixHelper.getRotationMatrix(beta_on_yz, "x")
-        rotate_from_xy = MatrixHelper.getRotationMatrix(-beta_on_yz, "x")
+        rotate_to_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_yz, "x")
+        rotate_from_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_yz, "x")
 
-        rotate_to_y = MatrixHelper.getRotationMatrix(beta_on_xy, "z")
-        rotate_from_y = MatrixHelper.getRotationMatrix(-beta_on_xy, "z")
+        rotate_to_y = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_xy, "z")
+        rotate_from_y = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_xy, "z")
 
-        rotate_on_y = MatrixHelper.getRotationMatrix(angle, "y")
+        rotate_on_y = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, "y")
 
         matrices = [
             to_origin,
@@ -123,3 +166,27 @@ class MatrixHelper():
                 )
 
         return matrices
+    
+    def calculateWindowNormalizations(
+        window_x_shift,
+        window_y_shift,
+        window_width,
+        window_height,
+        window_angle_x,
+        window_angle_y,
+        window_angle_z,
+    ):
+        translation_matrix = MatrixHelper.getTranslationMatrix(
+            window_x_shift, window_y_shift, 0
+        )
+        rotation_matrix = MatrixHelper.getRotationMatrix(
+            window_angle_x, window_angle_y, window_angle_z
+        )
+
+        scaling_matrix = MatrixHelper.getScaleMatrix(
+            2 / window_width, 2 / window_height, 2 / window_width
+        )
+
+        composition = reduce(np.dot, [translation_matrix, rotation_matrix, scaling_matrix])
+
+        return composition

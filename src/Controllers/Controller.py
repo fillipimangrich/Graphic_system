@@ -82,3 +82,7 @@ class Controller():
         obj.transform(transf_matrix)
         self.__viewport.update()
     
+    def rotateWindow(self, angle, axis):
+        self.__viewport.getWindow().rotate(angle, axis)
+        self.__viewport.update()
+    

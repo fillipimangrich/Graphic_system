@@ -5,6 +5,7 @@ class World():
 
     def addObject(self, object):
         self.__list_of_objects.append(object)
+        print(object.getCoordinates())
 
     def getObjects(self):
         return self.__list_of_objects

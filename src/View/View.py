@@ -2,6 +2,7 @@ import tkinter as tk
 from tkinter.colorchooser import askcolor
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+from src.View.RotateWindowTab import Rotation
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
 from src.shapes.Line import Line
@@ -28,6 +29,7 @@ class View(tk.Tk):
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
+        self.setRotationWindowButton()
         
         # teste
         self.descriptor = DescritorOBJ()
@@ -106,6 +108,18 @@ class View(tk.Tk):
         self.__add_object_button = tk.PhotoImage(file = f"src/Images/add_button.png")
         button_add = self.__control.create_image(230, 50, image=self.__add_object_button)
         self.__control.tag_bind(button_add, "<Button-1>", lambda x: self.openViewForAddNewShape())
+
+    
+    def setRotationWindowButton(self) -> None:
+        self.__rotation_window_button = tk.PhotoImage(file = f"src/Images/add_button.png")
+        button_rotation_window = self.__control.create_image(230, 150, image=self.__rotation_window_button)
+        self.__control.tag_bind(button_rotation_window, "<Button-1>", lambda x: self.openRotationWindowPopup())
+
+    def openRotationWindowPopup(self):
+        popup = tk.Toplevel(self.__control)
+        popup.title("Rotation")
+        self.navigation = Rotation(popup, self.__controller)
+        self.navigation.pack(side=tk.TOP, fill=tk.X, padx=5, pady=5)
 
     def openViewForAddNewShape(self) -> None:
         popup = tk.Toplevel()
