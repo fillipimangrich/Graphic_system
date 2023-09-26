@@ -2,7 +2,7 @@ import tkinter as tk
 
 
 class Rotation(tk.LabelFrame):
-    def __init__(self, master, controller):
+    def __init__(self, master, controller, view):
         super().__init__(
             master,
             width=50,
@@ -15,6 +15,7 @@ class Rotation(tk.LabelFrame):
 
         self.selected = tk.StringVar()
         self.controller = controller
+        self.view = view
 
         rotate_left_button = tk.Button(
             self, text="Rotate", font=("Arial", 10), command=self.rotate
@@ -51,8 +52,8 @@ class Rotation(tk.LabelFrame):
         if self.entry_angle.get():
             angle = self.entry_angle.get()
             axis_direction = self.selected.get()
-
-            print(axis_direction)
             self.controller.rotateWindow(int(angle), axis_direction)
+            self.view.draw()
+            self.master.destroy()
         else:
             self.controller.show_warning("No angle to rotate defined!")
