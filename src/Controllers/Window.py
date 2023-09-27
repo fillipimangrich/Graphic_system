@@ -61,10 +61,7 @@ class Window(Shape):
         to_be_Draw = []
 
         for obj in self.__world.getObjects():
-            if (self.__angle != 0):
-                matrix = MatrixHelper.calculateRotationMatrix(obj, np.radians(self.__angle), self.__axis)
-                obj.transform(matrix)
-
+           # cliping here
             to_be_Draw.append(obj)
                     
         self.setObjectsToBeDraw(to_be_Draw)
@@ -96,5 +93,5 @@ class Window(Shape):
         return transformed_coordinates
 
     def rotate(self, angle, axis):
-        self.__angle = angle
-        self.__axis = axis
+        pass
+        #need normalization to rotate
