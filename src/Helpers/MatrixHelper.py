@@ -113,6 +113,8 @@ class MatrixHelper():
     
 
     def calculateRotationMatrix(obj : Shape, angle, axis):
+        print(math.degrees(angle))
+        print(angle)
         center = obj.calcObjectCenter()
         x, y, z, o = center
         to_origin = MatrixHelper.getTranslationMatrix(-x, -y, -z)
@@ -120,30 +122,30 @@ class MatrixHelper():
 
         vector = obj.get_axis_vector(axis)
 
-        beta_on_yz = obj.getBetaOnYz(vector.copy())
+        # beta_on_yz = obj.getBetaOnYz(vector.copy())
 
-        beta_on_xy = obj.getBetaOnXy(vector.copy())
+        # beta_on_xy = obj.getBetaOnXy(vector.copy())
 
-        rotate_to_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_yz, "x")
-        rotate_from_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_yz, "x")
+        # rotate_to_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_yz, "x")
+        # rotate_from_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_yz, "x")
 
-        rotate_to_y = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_xy, "z")
-        rotate_from_y = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_xy, "z")
+        # rotate_to_y = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_xy, "z")
+        # rotate_from_y = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_xy, "z")
 
-        rotate_on_y = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, "y")
+        rotate_on_y = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, "x")
 
         matrices = [
             to_origin,
-            rotate_to_xy,
-            rotate_to_y,
+            # rotate_to_xy,
+            # rotate_to_y,
             rotate_on_y,
-            rotate_from_y,
-            rotate_from_xy,
+            # rotate_from_y,
+            # rotate_from_xy,
             translate_back,
         ]
         result = np.eye(4)
 
-        for n in range(7):
+        for n in range(3):
             result = np.matmul(result, matrices[n])
 
         return result
