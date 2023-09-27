@@ -73,8 +73,6 @@ class MatrixHelper():
     
 
     def calculateRotationMatrix(obj : Shape, angle, axis):
-        print(math.degrees(angle))
-        print(angle)
         center = obj.calcObjectCenter()
         x, y, z, o = center
         to_origin = MatrixHelper.getTranslationMatrix(-x, -y, -z)
