@@ -7,71 +7,31 @@ from src.shapes.Shape import Shape
 
 class MatrixHelper():
 
-    def getRotationMatrix(dX, dY, dZ):
-        """
-        Build rotation matrix as composition from:
-
-        Rx = [1  0       0       0]
-            [0  cos(dX) sen(dX) 0]
-            [0 -sen(dX) cos(dX) 0]
-            [0  0       0       1]
-
-        Ry = [cos(dY) 0 -sen(dY) 0]
-            [0       1 0        0]
-            [sen(dY) 0 cos(dY)  0]
-            [0       0 0        1]
-
-        Rz = [cos(dZ)  sen(dZ) 0 0]
-            [-sen(dZ) cos(dZ) 0 0]
-            [0        0       1 0]
-            [0        0       0 1]
-        """
-        Rx = np.identity(4)
-        Rx[1][1] = np.cos(np.deg2rad(dX))
-        Rx[1][2] = np.sin(np.deg2rad(dX))
-        Rx[2][1] = -np.sin(np.deg2rad(dX))
-        Rx[2][2] = np.cos(np.deg2rad(dX))
-
-        Ry = np.identity(4)
-        Ry[0][0] = np.cos(np.deg2rad(dY))
-        Ry[0][2] = -np.sin(np.deg2rad(dY))
-        Ry[2][0] = np.sin(np.deg2rad(dY))
-        Ry[2][2] = np.cos(np.deg2rad(dY))
-
-        Rz = np.identity(4)
-        Rz[0][0] = np.cos(np.deg2rad(dZ))
-        Rz[0][1] = np.sin(np.deg2rad(dZ))
-        Rz[1][0] = -np.sin(np.deg2rad(dZ))
-        Rz[1][1] = np.cos(np.deg2rad(dZ))
-
-        return reduce(np.dot, [Rx, Ry, Rz])
-
-
     def getRotationMatrixByAngleAndAxis(angle, axis):
         if axis == "x" or axis == (1, 0, 0):
             return np.array(
                 [
-                    [math.cos(angle), -math.sin(angle), 0, 0],
-                    [math.sin(angle), math.cos(angle), 0, 0],
-                    [0, 0, 1, 0],
+                    [1, 0, 0, 0],
+                    [0, math.cos(angle), -math.sin(angle), 0],
+                    [0, math.sin(angle), math.cos(angle), 0],
                     [0, 0, 0, 1]
                 ]
             )
         elif axis == "y" or axis == (0, 1, 0):
-            angle = angle + 90
+            
             return np.array(
                 [
-                    [math.cos(angle), -math.sin(angle), 0, 0],
-                    [math.sin(angle), math.cos(angle), 0, 0],
-                    [0, 0, 1, 0],
+                    [math.cos(angle), 0, math.sin(angle), 0],
+                    [0, 1, 0, 0],
+                    [-math.sin(angle), 0, math.cos(angle), 0],
                     [0, 0, 0, 1]
                 ]
             )
         elif axis == "z" or axis == (0, 0, 1):
             return np.array(
                 [
-                    [math.cos(angle), math.sin(angle), 0, 0],
-                    [-math.sin(angle), math.cos(angle), 0, 0],
+                    [math.cos(angle), -math.sin(angle), 0, 0],
+                    [math.sin(angle), math.cos(angle), 0, 0],
                     [0, 0, 1, 0],
                     [0, 0, 0, 1]
                 ]
@@ -120,32 +80,17 @@ class MatrixHelper():
         to_origin = MatrixHelper.getTranslationMatrix(-x, -y, -z)
         translate_back = MatrixHelper.getTranslationMatrix(x, y, z)
 
-        vector = obj.get_axis_vector(axis)
 
-        # beta_on_yz = obj.getBetaOnYz(vector.copy())
-
-        # beta_on_xy = obj.getBetaOnXy(vector.copy())
-
-        # rotate_to_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_yz, "x")
-        # rotate_from_xy = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_yz, "x")
-
-        # rotate_to_y = MatrixHelper.getRotationMatrixByAngleAndAxis(beta_on_xy, "z")
-        # rotate_from_y = MatrixHelper.getRotationMatrixByAngleAndAxis(-beta_on_xy, "z")
-
-        rotate_on_y = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, "x")
+        rotate_on_axis = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, axis)
 
         matrices = [
             to_origin,
-            # rotate_to_xy,
-            # rotate_to_y,
-            rotate_on_y,
-            # rotate_from_y,
-            # rotate_from_xy,
+            rotate_on_axis,
             translate_back,
         ]
         result = np.eye(4)
 
-        for n in range(3):
+        for n in range(len(matrices)):
             result = np.matmul(result, matrices[n])
 
         return result
