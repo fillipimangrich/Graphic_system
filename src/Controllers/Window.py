@@ -1,7 +1,10 @@
 from src.Helpers.MatrixHelper import MatrixHelper
 from src.shapes.Shape import Shape
+from src.shapes.Point import Point
+from src.shapes.Line import Line
 from src.Controllers.World import World
 from src.Settings.Settings import Settings
+
 import copy
 
 WINDOW_COORDINATES = [
@@ -70,8 +73,72 @@ class Window(Shape):
         to_be_Draw = []
 
         for obj in self.__world.getObjects():
-           # cliping here
-            to_be_Draw.append(obj)
+            if type(obj) == Point:
+                x,y,z,w = obj.getCoordinates()[0]
+                print(x, self.__Xwmin)
+                if (
+                    ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
+                    ((y >= self.__Ywmin) and (y <= self.__Ywmax))
+                    ):
+                    to_be_Draw.append(obj)
+
+            elif type(obj) == Point:
+
+                #cohen sutterland
+                RC1 = 0
+                RC2 = 0
+                x0, y0, z0, w0 = obj.getCoordinates()[0]
+                x1, y1, z1, w1 = obj.getCoordinates()[1]
+
+                if (x0 > self.__Xwmax):
+                    RC1 += 2
+                elif (x0 < self.__Xwmin):
+                    RC1 += 1
+                
+                if (y0 > self.__Ywmax):
+                    RC1 += 8
+                elif (y0 < self.__Ywmin):
+                    RC1 += 4
+                
+                if (x1 > self.__Xwmax):
+                    RC2 += 2
+                elif (x1 < self.__Xwmin):
+                    RC2 += 1
+                
+                if (y1 > self.__Ywmax):
+                    RC2 += 8
+                elif (y1 < self.__Ywmin):
+                    RC2 += 4
+
+                # both points are inside the window
+                if not ((RC1 == 0) and (RC2 == 0)):
+                    to_be_Draw.append(obj)
+
+                # if(RC1&RC2) out of the window
+
+                # partially in the window
+                elif not (RC1&RC2):
+                    #calculate the intersect point if one of the points is in the left of the window and the other is inside the window
+                    if ((RC1 == 1) and (RC2 == 0)):
+                        m = (y1-y0)/(x1-x0)
+                        y_intersect = m*(self.__Xwmin-x0)+y0
+                        if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
+                            pass
+                            #update the point
+                        
+
+
+                
+                    
+            else:
+                for coordinate in obj.getCoordinates():
+                    x,y,z,w = coordinate
+                    if (
+                        ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
+                        ((y >= self.__Ywmin) and (y <= self.__Ywmax))
+                        ):
+                        to_be_Draw.append(obj)
+                        break
                     
         self.setObjectsToBeDraw(to_be_Draw)
                     
