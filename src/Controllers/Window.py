@@ -66,8 +66,7 @@ class Window(Shape):
         y = ((self.getYwmax()-self.getYwmin())/2)+self.getYwmin()
         return x,y,0
     
-    def updateObjects(self):
-
+    def updateObjects(self, line_clipping_method):
         self.setNormalizedCoordinates()
 
         to_be_Draw = []

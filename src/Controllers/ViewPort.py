@@ -20,8 +20,8 @@ class ViewPort():
     def getObjectsToBeDrawTransformed(self):
         return self.__objects_to_be_draw_transformed
 
-    def update(self):
-        self.__window.updateObjects()
+    def update(self, line_clipping_method):
+        self.__window.updateObjects(line_clipping_method)
         self.transformAllObjects()
 
     def transformAllObjects(self):

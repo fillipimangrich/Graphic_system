@@ -1,5 +1,6 @@
 import tkinter as tk
 from tkinter import filedialog
+from tkinter import ttk
 from tkinter.colorchooser import askcolor
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
@@ -34,9 +35,25 @@ class View(tk.Tk):
         self.setAddObjectButton()
         self.setRotationWindowButton()
         self.setOBJButton()
+        self.setClippingAlghoritmsButtons()
 
         self.mainloop()
     
+
+    def on_algorithm_selected(self, evt):
+        self.__controller.chosen_clipping_algorithm = self.__algorithm_combobox.get()
+
+
+    def setClippingAlghoritmsButtons(self):
+        algorithms = ["Cohen–Sutherland", "Liang-Barsky"]
+        algorithm_label = tk.Label(self.__control, text="Line Clipping Method", bg="#565656", fg="#FFFFFF")  # Ajuste as cores de fundo (bg) e texto (fg) conforme necessário.
+        algorithm_label.place(x=10, y=300)
+        self.__algorithm_combobox = ttk.Combobox(self.__control, values=algorithms)
+        self.__algorithm_combobox.place(x=10, y=320)
+        self.__algorithm_combobox.set(self.__controller.chosen_clipping_algorithm)  # Valor padrão
+        self.__algorithm_combobox.bind("<<ComboboxSelected>>", self.on_algorithm_selected)
+
+
     def setDrawingObject(self, drawing_object, popup):
         self.__drawing_object = drawing_object
         self.__points_counter = 0
