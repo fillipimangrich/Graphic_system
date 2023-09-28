@@ -32,6 +32,8 @@ class ViewPort():
         
         self.__objects_to_be_draw_transformed = to_be_draw_copy
 
+    
+
     def viewportTransform(self, coordinates):
         transformed_coordinates = []
 

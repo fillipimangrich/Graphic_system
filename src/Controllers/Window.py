@@ -54,6 +54,11 @@ class Window(Shape):
     
     def setYwmax(self, Ywmax):
         self.__Ywmax = Ywmax
+
+    def getCenter(self):
+        x = ((self.getXwmax()-self.getXwmin())/2)+self.getXwmin()
+        y = ((self.getYwmax()-self.getYwmin())/2)+self.getYwmin()
+        return x,y,0
     
     def updateObjects(self):
         to_be_Draw = []
@@ -107,5 +112,7 @@ class Window(Shape):
 
 
     def rotate(self, angle, axis):
-        pass
-        #need normalization to rotate
+        x,y,z = self.getCenter()
+        for obj in self.__world.getObjects():
+            transform_matrix = MatrixHelper.calculateWindowRotationMatrix(obj,angle,axis,x,y,z)
+            obj.transform(transform_matrix)

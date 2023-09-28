@@ -75,9 +75,33 @@ class MatrixHelper():
     def calculateRotationMatrix(obj : Shape, angle, axis):
         center = obj.calcObjectCenter()
         x, y, z, o = center
+
         to_origin = MatrixHelper.getTranslationMatrix(-x, -y, -z)
+
         translate_back = MatrixHelper.getTranslationMatrix(x, y, z)
 
+        rotate_on_axis = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, axis)
+
+        matrices = [
+            to_origin,
+            rotate_on_axis,
+            translate_back,
+        ]
+        result = np.eye(4)
+
+        for n in range(len(matrices)):
+            result = np.matmul(result, matrices[n])
+
+        return result
+    
+    def calculateWindowRotationMatrix(obj : Shape, angle, axis,Wx,Wy,Wz):
+        angle = math.radians(angle)
+        center = obj.calcObjectCenter()
+        x, y, z, o = center
+
+        to_origin = MatrixHelper.getTranslationMatrix(-(x-(x-Wx)), -(y-(y-Wy)), -(z-Wz))
+
+        translate_back = MatrixHelper.getTranslationMatrix((x-(x-Wx)), (y-(y-Wy)), z-Wz)
 
         rotate_on_axis = MatrixHelper.getRotationMatrixByAngleAndAxis(angle, axis)
 
