@@ -2,7 +2,7 @@ from src.Helpers.MatrixHelper import MatrixHelper
 from src.shapes.Shape import Shape
 from src.Controllers.World import World
 from src.Settings.Settings import Settings
-import numpy as np
+import copy
 
 WINDOW_COORDINATES = [
     (0, 0, 0, 1),
@@ -16,13 +16,11 @@ class Window(Shape):
         super().__init__(name="window", coordinates=WINDOW_COORDINATES)
         self.__world = World()
         self.__objects_to_be_draw = []
-        self.__size = [920, 460]
         self.__Xwmin = 0
         self.__Xwmax = 920
         self.__Ywmin = 0
         self.__Ywmax = 460
-        self.__angle = 0
-        self.__axis = 'x'
+
     
     def getObjectsToBeDraw(self):
         return self.__objects_to_be_draw
@@ -91,6 +89,22 @@ class Window(Shape):
             transformed_coordinates.append((xw, yw, z_v, w_v))
 
         return transformed_coordinates
+
+    def setNormalizedCoordinates(self):
+        normalized_coordinates = []
+
+        for obj in self.__world.getObjects():
+            obj_copy = copy.deepcopy(obj)
+            new_coordinates = []
+            for x,y,z,w in obj_copy.getCoordinates():
+                new_x = ((x/(self.getXwmax()-self.getXwmin()))-0.5)*2
+                new_y = ((y/(self.getYwmax()-self.getYwmin()))-0.5)*2
+                new_coordinates.append((new_x,new_y,z,w))
+
+            normalized_coordinates.append(obj_copy)
+                    
+        self.__normalized_coordinates = normalized_coordinates
+
 
     def rotate(self, angle, axis):
         pass
