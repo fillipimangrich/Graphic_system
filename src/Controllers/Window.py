@@ -81,9 +81,7 @@ class Window(Shape):
                     ):
                     to_be_Draw.append(obj)
 
-            elif type(obj) == Point:
-
-                #cohen sutterland
+            elif type(obj) == Line:
                 RC1 = 0
                 RC2 = 0
                 x0, y0, z0, w0 = obj.getCoordinates()[0]
@@ -113,8 +111,6 @@ class Window(Shape):
                 if not ((RC1 == 0) and (RC2 == 0)):
                     to_be_Draw.append(obj)
 
-                # if(RC1&RC2) out of the window
-
                 # partially in the window
                 elif not (RC1&RC2):
                     #calculate the intersect point if one of the points is in the left of the window and the other is inside the window
@@ -124,6 +120,44 @@ class Window(Shape):
                         if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
                             pass
                             #update the point
+
+                if RC1 & RC2:
+                    continue 
+
+                x0_clipped, y0_clipped = x0, y0
+                x1_clipped, y1_clipped = x1, y1
+
+                m = (y1 - y0) / (x1 - x0) if x1 != x0 else None 
+
+                if RC1 != 0:
+                    if RC1 & 1:
+                        y0_clipped = m * (self.__Xwmin - x0) + y0
+                        x0_clipped = self.__Xwmin
+                    elif RC1 & 2:
+                        y0_clipped = m * (self.__Xwmax - x0) + y0
+                        x0_clipped = self.__Xwmax
+                    if RC1 & 4:
+                        x0_clipped = x0 + (1/m) * (self.__Ywmin - y0)
+                        y0_clipped = self.__Ywmin
+                    elif RC1 & 8:
+                        x0_clipped = x0 + (1/m) * (self.__Ywmax - y0)
+                        y0_clipped = self.__Ywmax
+
+                if RC2 != 0:
+                    if RC2 & 1:
+                        y1_clipped = m * (self.__Xwmin - x1) + y1
+                        x1_clipped = self.__Xwmin
+                    elif RC2 & 2:
+                        y1_clipped = m * (self.__Xwmax - x1) + y1
+                        x1_clipped = self.__Xwmax
+                    if RC2 & 4:
+                        x1_clipped = x1 + (1/m) * (self.__Ywmin - y1)
+                        y1_clipped = self.__Ywmin
+                    elif RC2 & 8:
+                        x1_clipped = x1 + (1/m) * (self.__Ywmax - y1)
+                        y1_clipped = self.__Ywmax
+
+                to_be_Draw.append((x0_clipped, y0_clipped, x1_clipped, y1_clipped))
                         
                     
             else:
