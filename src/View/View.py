@@ -316,7 +316,7 @@ class View(tk.Tk):
             elif object_type == Line:
                 self.drawLine(color, coordinates)
             else:
-                self.drawWireFrame(color, coordinates)
+                self.drawFilledWireFrame(color, coordinates)
     
 
     def handleWithEvent(self, event):
@@ -395,3 +395,44 @@ class View(tk.Tk):
                 x1, y1, z1, w = p1
                 x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
+    def drawFilledWireFrame(self, color, coordinates):
+        for point in range(len(coordinates)):
+            p1 = coordinates[point]
+            p2 = coordinates[(point + 1) % len(coordinates)]
+            x1, y1, z1, w = p1
+            x2, y2, z2, w = p2
+            self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+        
+        y_coords = [coord[1] for coord in coordinates]
+        y_min, y_max = min(y_coords), max(y_coords)
+
+        for y in range(int(y_min), int(y_max) + 1):
+            intersections = []
+            for i in range(len(coordinates)):
+                p1 = coordinates[i]
+                p2 = coordinates[(i + 1) % len(coordinates)]
+                
+                if self.crossesBorderHorizontal(p1, p2, y):
+                    x_cross = self.interpolateX(p1, p2, y)
+                    intersections.append(x_cross)
+
+            intersections.sort()
+            for i in range(0, len(intersections)-1, 2):
+                x_start = intersections[i]
+                x_end = intersections[i+1]
+                self.__view_port.create_line(x_start, y, x_end, y, fill=color, width=self.__line_width)
+
+
+    def interpolateX(self, p1, p2, y):
+        x1, y1 = p1[0], p1[1]
+        x2, y2 = p2[0], p2[1]
+
+        if y1 == y2:
+            return x1
+
+        return x1 + (x2 - x1) * (y - y1) / (y2 - y1)
+
+    def crossesBorderHorizontal(self, p1, p2, y):
+        y1, y2 = p1[1], p2[1]
+        return (y1 <= y <= y2) or (y2 <= y <= y1)
