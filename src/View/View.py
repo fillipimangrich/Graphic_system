@@ -3,6 +3,7 @@ from tkinter import filedialog
 from tkinter.colorchooser import askcolor
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+from src.View.ChoiceDialog import ChoiceDialog
 from src.View.RotateWindowTab import Rotation
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
@@ -21,6 +22,7 @@ class View(tk.Tk):
         self.__drawing_object = "Point"
         self.__points_counter = 0
         self.__object_name = "Wireframe 1"
+        self.__last_mode_choice = "Arame"
 
     def run(self) -> None:
         self.geometry("1280x720")
@@ -316,7 +318,12 @@ class View(tk.Tk):
             elif object_type == Line:
                 self.drawLine(color, coordinates)
             else:
-                self.drawFilledWireFrame(color, coordinates)
+                if obj.fill_mode == "Arame":
+                    self.drawWireFrame(color, coordinates)
+                elif obj.fill_mode == "Grelha":
+                    self.drawGridWireFrame(color, coordinates, 25)
+                else:
+                    self.drawFilledWireFrame(color, coordinates)
     
 
     def handleWithEvent(self, event):
@@ -359,8 +366,10 @@ class View(tk.Tk):
                 points.append((event.x,event.y,0))
                 if(self.__points_counter == 2):
                     self.__object_name = askstring("Nome","Digite o nome")
+                    choice = ChoiceDialog(self, title="Escolha um modo")
+                    self.__last_mode_choice = choice.result
                     showinfo("Info", "Agora você pode continuar adicionando pontos para o seu Wireframe")
-                wire_frame = WireFrame(self.__object_name, points)
+                wire_frame = WireFrame(self.__object_name, points, self.__last_mode_choice)
                 wire_frame.setId(last_object.getId())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(wire_frame)
@@ -370,16 +379,19 @@ class View(tk.Tk):
                 
                 self.__points_counter += 1
 
+
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
         x, y, z, w = p1
         self.__view_port.create_oval(x-2, y-2, x+2, y+2, fill=color)
+
 
     def drawLine(self, color, coordinates):
         p1, p2 = coordinates
         x1, y1, z1, w = p1
         x2, y2, z2, w = p2
         self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
 
     def drawWireFrame(self, color, coordinates):
         for point in range(len(coordinates)):
@@ -395,6 +407,71 @@ class View(tk.Tk):
                 x1, y1, z1, w = p1
                 x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
+    
+    def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
+        for point in range(len(coordinates)):
+            p1 = coordinates[point]
+            p2 = coordinates[(point + 1) % len(coordinates)]
+            x1, y1, z1, w = p1
+            x2, y2, z2, w = p2
+            self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+        
+        y_coords = [coord[1] for coord in coordinates]
+        y_min, y_max = min(y_coords), max(y_coords)
+        for y in range(int(y_min), int(y_max) + 1, grid_spacing):
+            intersections = self.getHorizontalIntersections(y, coordinates)
+            for i in range(0, len(intersections)-1, 2):
+                x_start = intersections[i]
+                x_end = intersections[i+1]
+                self.__view_port.create_line(x_start, y, x_end, y, fill=color, width=self.__line_width)
+
+        x_coords = [coord[0] for coord in coordinates]
+        x_min, x_max = min(x_coords), max(x_coords)
+        for x in range(int(x_min), int(x_max) + 1, grid_spacing):
+            intersections = self.getVerticalIntersections(x, coordinates)
+            for i in range(0, len(intersections)-1, 2):
+                y_start = intersections[i]
+                y_end = intersections[i+1]
+                self.__view_port.create_line(x, y_start, x, y_end, fill=color, width=self.__line_width)
+
+
+    def getHorizontalIntersections(self, y, coordinates):
+        intersections = []
+        for i in range(len(coordinates)):
+            p1 = coordinates[i]
+            p2 = coordinates[(i + 1) % len(coordinates)]
+            if self.crossesBorderHorizontal(p1, p2, y):
+                x_cross = self.interpolateX(p1, p2, y)
+                intersections.append(x_cross)
+        return sorted(intersections)
+
+
+    def getVerticalIntersections(self, x, coordinates):
+        intersections = []
+        for i in range(len(coordinates)):
+            p1 = coordinates[i]
+            p2 = coordinates[(i + 1) % len(coordinates)]
+            if self.crossesBorderVertical(p1, p2, x):
+                y_cross = self.interpolateY(p1, p2, x)
+                intersections.append(y_cross)
+        return sorted(intersections)
+
+
+    def crossesBorderVertical(self, p1, p2, x):
+        x1, x2 = p1[0], p2[0]
+        return (x1 <= x <= x2) or (x2 <= x <= x1)
+
+
+    def interpolateY(self, p1, p2, x):
+        x1, y1 = p1[0], p1[1]
+        x2, y2 = p2[0], p2[1]
+
+        if x1 == x2:
+            return y1
+
+        return y1 + (y2 - y1) * (x - x1) / (x2 - x1)
+
 
     def drawFilledWireFrame(self, color, coordinates):
         for point in range(len(coordinates)):
@@ -432,6 +509,7 @@ class View(tk.Tk):
             return x1
 
         return x1 + (x2 - x1) * (y - y1) / (y2 - y1)
+    
 
     def crossesBorderHorizontal(self, p1, p2, y):
         y1, y2 = p1[1], p2[1]
