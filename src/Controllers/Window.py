@@ -54,6 +54,9 @@ class Window(Shape):
     
     def setYwmax(self, Ywmax):
         self.__Ywmax = Ywmax
+    
+    def getNormalizedCoordenates(self):
+        return self.__normalized_coordinates
 
     def getCenter(self):
         x = ((self.getXwmax()-self.getXwmin())/2)+self.getXwmin()
@@ -61,6 +64,9 @@ class Window(Shape):
         return x,y,0
     
     def updateObjects(self):
+
+        self.setNormalizedCoordinates()
+
         to_be_Draw = []
 
         for obj in self.__world.getObjects():

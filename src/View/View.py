@@ -120,11 +120,20 @@ class View(tk.Tk):
         self.addObjectToList(wire_frame)
         self.draw()
 
-    
     def setRotationWindowButton(self) -> None:
         self.__rotation_window_button = tk.PhotoImage(file = f"src/Images/rotate_button.png")
         button_rotation_window = self.__control.create_image(150, 150, image=self.__rotation_window_button)
         self.__control.tag_bind(button_rotation_window, "<Button-1>", lambda x: self.openRotationWindowPopup())
+        self.__rotation_left = tk.PhotoImage(file = f"src/Images/rotate_left.png")
+        button_rotation_window_left = self.__control.create_image(30, 160, image=self.__rotation_left)
+        self.__control.tag_bind(button_rotation_window_left, "<Button-1>", lambda x: self.rotate(-30,"z"))
+        self.__rotation_right = tk.PhotoImage(file = f"src/Images/rotate_right.png")
+        button_rotation_window_right = self.__control.create_image(270, 160, image=self.__rotation_right)
+        self.__control.tag_bind(button_rotation_window_right, "<Button-1>", lambda x: self.rotate(30,"z"))
+
+    def rotate(self, angle, axis):
+        self.__controller.rotateWindow(angle, axis)
+        self.draw()
 
     def openRotationWindowPopup(self):
         popup = tk.Toplevel(self.__control)
