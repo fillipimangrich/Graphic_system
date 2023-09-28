@@ -126,9 +126,6 @@ class Window(Shape):
                             pass
                             #update the point
                         
-
-
-                
                     
             else:
                 for coordinate in obj.getCoordinates():
