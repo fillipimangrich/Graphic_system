@@ -71,10 +71,12 @@ class Window(Shape):
 
         to_be_Draw = []
 
-        for obj in self.__world.getObjects():
+        objs = copy.deepcopy(self.__world.getObjects())
+        
+        for obj in objs:
             if type(obj) == Point:
                 x,y,z,w = obj.getCoordinates()[0]
-                print(x, self.__Xwmin)
+                
                 if (
                     ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
                     ((y >= self.__Ywmin) and (y <= self.__Ywmax))
@@ -107,19 +109,9 @@ class Window(Shape):
                 elif (y1 < self.__Ywmin):
                     RC2 += 4
 
-                # both points are inside the window
-                if not ((RC1 == 0) and (RC2 == 0)):
+                if ((RC1 == 0) and (RC2 == 0)):
                     to_be_Draw.append(obj)
-
-                # partially in the window
-                elif not (RC1&RC2):
-                    #calculate the intersect point if one of the points is in the left of the window and the other is inside the window
-                    if ((RC1 == 1) and (RC2 == 0)):
-                        m = (y1-y0)/(x1-x0)
-                        y_intersect = m*(self.__Xwmin-x0)+y0
-                        if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
-                            pass
-                            #update the point
+                    continue
 
                 if RC1 & RC2:
                     continue 
@@ -142,6 +134,8 @@ class Window(Shape):
                     elif RC1 & 8:
                         x0_clipped = x0 + (1/m) * (self.__Ywmax - y0)
                         y0_clipped = self.__Ywmax
+                    obj.getCoordinates()[0] = (x0_clipped, y0_clipped, 0, 1)
+                    
 
                 if RC2 != 0:
                     if RC2 & 1:
@@ -156,8 +150,11 @@ class Window(Shape):
                     elif RC2 & 8:
                         x1_clipped = x1 + (1/m) * (self.__Ywmax - y1)
                         y1_clipped = self.__Ywmax
+                    obj.getCoordinates()[1] = (x1_clipped, y1_clipped, 0, 1)
 
-                to_be_Draw.append((x0_clipped, y0_clipped, x1_clipped, y1_clipped))
+                to_be_Draw.append(obj)
+
+                
                         
                     
             else:
@@ -219,3 +216,34 @@ class Window(Shape):
         for obj in self.__world.getObjects():
             transform_matrix = MatrixHelper.calculateWindowRotationMatrix(obj,angle,axis,x,y,z)
             obj.transform(transform_matrix)
+
+
+                # #calculate the intersect point if one of the points is in the left of the window and the other is inside the window
+                # if ((RC1 == 1) and (RC2 == 0)):
+                #     m = (y1-y0)/(x1-x0)
+                #     y_intersect = m*(self.__Xwmin-x0)+y0
+                #     if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
+                #         obj.getCoordinates()[0] = (self.__Xwmin, y_intersect,0,1)
+                #         to_be_Draw.append(obj)
+                #     continue
+                
+                # if ((RC1 == 1) and (RC2 == 8)):
+                #     m = (y1-y0)/(x1-x0)
+                #     y_intersect = m*(self.__Xwmin-x0)+y0
+                #     x_intersect = x0+((1/m)*(self.__Ywmax-y0))
+                #     if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
+                #         obj.getCoordinates()[0] = (self.__Xwmin, y_intersect,0,1)
+                #         obj.getCoordinates()[1] = (x_intersect, self.__Ywmax,0,1)
+                #         to_be_Draw.append(obj)
+                #     continue
+                        
+                # if ((RC1 == 1) and (RC2 == 4)):
+                #     m = (y1-y0)/(x1-x0)
+                #     y_intersect = m*(self.__Xwmin-x0)+y0
+                #     x_intersect = x0+((1/m)*(self.__Ywmin-y0))
+                #     if (y_intersect > self.__Ywmin and y_intersect < self.__Ywmax):
+                #         print(y0, y_intersect)
+                #         obj.getCoordinates()[0] = (self.__Xwmin, y_intersect,0,1)
+                #         obj.getCoordinates()[1] = (x_intersect, self.__Ywmin,0,1)
+                #         to_be_Draw.append(obj)
+                #     continue
