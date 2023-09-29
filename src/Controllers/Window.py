@@ -79,8 +79,8 @@ class Window(Shape):
                 x,y,z,w = obj.getCoordinates()[0]
                 
                 if (
-                    ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
-                    ((y >= self.__Ywmin) and (y <= self.__Ywmax))
+                    ((x >= self.__Xwmin+50) and (x <= self.__Xwmax-50)) and
+                    ((y >= self.__Ywmin+50) and (y <= self.__Ywmax-50))
                     ):
                     to_be_Draw.append(obj)
 
