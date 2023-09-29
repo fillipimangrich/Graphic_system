@@ -1,3 +1,4 @@
+from src.shapes.WireFrame import WireFrame
 from src.Helpers.MatrixHelper import MatrixHelper
 from src.shapes.Shape import Shape
 from src.shapes.Point import Point
@@ -65,6 +66,82 @@ class Window(Shape):
         x = ((self.getXwmax()-self.getXwmin())/2)+self.getXwmin()
         y = ((self.getYwmax()-self.getYwmin())/2)+self.getYwmin()
         return x,y,0
+    
+    def is_inside_window(self, p, xmin, xmax, ymin, ymax):
+        print(p)
+        x, y, z, w = p
+        return xmin <= x <= xmax and ymin <= y <= ymax
+
+    def get_intersection(self, p1, p2, xmin, xmax, ymin, ymax):
+        x0, y0, z0 ,w0 = p1
+        x1, y1, z1, w1 = p2
+
+        RC1 = 0
+        RC2 = 0
+
+        if (x0 > xmax):
+            RC1 += 2
+        elif (x0 < xmin):
+            RC1 += 1
+
+        if (y0 > ymax):
+            RC1 += 8
+        elif (y0 < ymin):
+            RC1 += 4
+
+        if (x1 > xmax):
+            RC2 += 2
+        elif (x1 < xmin):
+            RC2 += 1
+
+        if (y1 > ymax):
+            RC2 += 8
+        elif (y1 < ymin):
+            RC2 += 4
+
+        if RC1 & RC2:
+            return None, None
+
+        m = (y1 - y0) / (x1 - x0) if x1 != x0 else None 
+
+        if RC1 != 0:
+            if RC1 & 1:
+                y0 = m * (xmin - x0) + y0
+                x0 = xmin
+            elif RC1 & 2:
+                y0 = m * (xmax - x0) + y0
+                x0 = xmax
+            if RC1 & 4:
+                x0 = x0 + (1/m) * (ymin - y0)
+                y0 = ymin
+            elif RC1 & 8:
+                x0 = x0 + (1/m) * (ymax - y0)
+                y0 = ymax
+
+        if RC2 != 0:
+            if RC2 & 1:
+                y1 = m * (xmin - x1) + y1
+                x1 = xmin
+            elif RC2 & 2:
+                y1 = m * (xmax - x1) + y1
+                x1 = xmax
+            if RC2 & 4:
+                x1 = x1 + (1/m) * (ymin - y1)
+                y1 = ymin
+            elif RC2 & 8:
+                x1 = x1 + (1/m) * (ymax - y1)
+                y1 = ymax
+
+        return (x0, y0, z0, w0), (x1, y1, z1, w1)
+
+    def label_vertices(self, vertices, xmin, xmax, ymin, ymax):
+        labels = []
+        for v in vertices:
+            if self.is_inside_window(v, xmin, xmax, ymin, ymax):
+                labels.append('inside')
+            else:
+                labels.append('outside')
+        return labels
     
     def updateObjects(self, line_clipping_method):
         self.setNormalizedCoordinates()
@@ -152,20 +229,45 @@ class Window(Shape):
                         y1_clipped = self.__Ywmax
                     obj.getCoordinates()[1] = (x1_clipped, y1_clipped, 0, 1)
 
-                to_be_Draw.append(obj)
-
-                
-                        
-                    
+                print('coordenadas reta')
+                print(obj.getCoordinates())
+                to_be_Draw.append(obj)             
             else:
-                for coordinate in obj.getCoordinates():
-                    x,y,z,w = coordinate
-                    if (
-                        ((x >= self.__Xwmin) and (x <= self.__Xwmax)) and
-                        ((y >= self.__Ywmin) and (y <= self.__Ywmax))
-                        ):
-                        to_be_Draw.append(obj)
-                        break
+                xmin, ymin = self.__Xwmin, self.__Ywmin
+                xmax, ymax = self.__Xwmax, self.__Ywmax
+                vertices = obj.getCoordinates()
+                labels = self.label_vertices(vertices, xmin, xmax, ymin, ymax)
+                
+                new_polygon = []
+
+                for i in range(len(vertices)):
+                    start = vertices[i]
+                    end = vertices[(i + 1) % len(vertices)]
+                    print('end',end)
+                    start_label = labels[i]
+                    end_label = labels[(i + 1) % len(vertices)]
+                    
+                    if start_label == 'inside' and end_label == 'inside':
+                        print('aqui1')
+                        new_polygon.append(end.tolist())
+                    elif start_label == 'inside' and end_label == 'outside':
+                        print('aqui2')
+                        intersection = self.get_intersection(start, end, xmin, xmax, ymin, ymax)
+                        new_polygon.append(list(intersection))
+                    elif start_label == 'outside' and end_label == 'inside':
+                        print('aqui3')
+                        intersection = self.get_intersection(start, end, xmin, xmax, ymin, ymax)
+                        new_polygon.append(list(intersection))
+                        new_polygon.append(end.tolist())
+                if new_polygon:
+                    flat_polygon = []
+                    for point in new_polygon:
+                        if isinstance(point, (list, tuple)) and isinstance(point[0], (list, tuple)):
+                            flat_polygon.extend(point)
+                        else:
+                            flat_polygon.append(point)
+                    new_obj = WireFrame(obj.getName(), flat_polygon, obj.fill_mode)
+                    to_be_Draw.append(new_obj)
                     
         self.setObjectsToBeDraw(to_be_Draw)
                     
