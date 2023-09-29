@@ -68,7 +68,6 @@ class Window(Shape):
         return x,y,0
     
     def is_inside_window(self, p, xmin, xmax, ymin, ymax):
-        print(p)
         x, y, z, w = p
         return xmin <= x <= xmax and ymin <= y <= ymax
 
@@ -162,80 +161,121 @@ class Window(Shape):
                     to_be_Draw.append(obj)
 
             elif type(obj) == Line:
-                RC1 = 0
-                RC2 = 0
-                x0, y0, z0, w0 = obj.getCoordinates()[0]
-                x1, y1, z1, w1 = obj.getCoordinates()[1]
+                new_coords = None
+                if line_clipping_method == 'Cohen–Sutherland':
+                    RC1 = 0
+                    RC2 = 0
+                    x0, y0, z0, w0 = obj.getCoordinates()[0]
+                    x1, y1, z1, w1 = obj.getCoordinates()[1]
 
-                if (x0 > self.__Xwmax-50):
-                    RC1 += 2
-                elif (x0 < self.__Xwmin+50):
-                    RC1 += 1
-                
-                if (y0 > self.__Ywmax-50):
-                    RC1 += 8
-                elif (y0 < self.__Ywmin+50):
-                    RC1 += 4
-                
-                if (x1 > self.__Xwmax-50):
-                    RC2 += 2
-                elif (x1 < self.__Xwmin+50):
-                    RC2 += 1
-                
-                if (y1 > self.__Ywmax-50):
-                    RC2 += 8
-                elif (y1 < self.__Ywmin+50):
-                    RC2 += 4
-
-                if ((RC1 == 0) and (RC2 == 0)):
-                    to_be_Draw.append(obj)
-                    continue
-
-                if RC1 & RC2:
-                    continue 
-
-                x0_clipped, y0_clipped = x0, y0
-                x1_clipped, y1_clipped = x1, y1
-
-                m = (y1 - y0) / (x1 - x0) if x1 != x0 else None 
-
-                if RC1 != 0:
-                    if RC1 & 1:
-                        y0_clipped = m * (self.__Xwmin+50 - x0) + y0
-                        x0_clipped = self.__Xwmin+50
-                    elif RC1 & 2:
-                        y0_clipped = m * (self.__Xwmax-50 - x0) + y0
-                        x0_clipped = self.__Xwmax -50
-                    if RC1 & 4:
-                        x0_clipped = x0 + (1/m) * (self.__Ywmin+50 - y0)
-                        y0_clipped = self.__Ywmin+50
-                    elif RC1 & 8:
-                        x0_clipped = x0 + (1/m) * (self.__Ywmax-50 - y0)
-                        y0_clipped = self.__Ywmax-50
-                    obj.getCoordinates()[0] = (x0_clipped, y0_clipped, z0, w0)
+                    if (x0 > self.__Xwmax-50):
+                        RC1 += 2
+                    elif (x0 < self.__Xwmin+50):
+                        RC1 += 1
                     
+                    if (y0 > self.__Ywmax-50):
+                        RC1 += 8
+                    elif (y0 < self.__Ywmin+50):
+                        RC1 += 4
+                    
+                    if (x1 > self.__Xwmax-50):
+                        RC2 += 2
+                    elif (x1 < self.__Xwmin+50):
+                        RC2 += 1
+                    
+                    if (y1 > self.__Ywmax-50):
+                        RC2 += 8
+                    elif (y1 < self.__Ywmin+50):
+                        RC2 += 4
 
-                if RC2 != 0:
-                    if RC2 & 1:
-                        y1_clipped = m * (self.__Xwmin+50 - x1) + y1
-                        x1_clipped = self.__Xwmin+50
-                    elif RC2 & 2:
-                        y1_clipped = m * (self.__Xwmax-50 - x1) + y1
-                        x1_clipped = self.__Xwmax-50
-                    if RC2 & 4:
-                        x1_clipped = x1 + (1/m) * (self.__Ywmin+50 - y1)
-                        y1_clipped = self.__Ywmin+50
-                    elif RC2 & 8:
-                        x1_clipped = x1 + (1/m) * (self.__Ywmax-50 - y1)
-                        y1_clipped = self.__Ywmax-50
-                    obj.getCoordinates()[1] = (x1_clipped, y1_clipped, z1, w1)
+                    if ((RC1 == 0) and (RC2 == 0)):
+                        to_be_Draw.append(obj)
+                        continue
 
-                print('coordenadas reta')
-                print(obj.getCoordinates())
-                to_be_Draw.append(obj)             
-            else:
-                xmin, ymin = self.__Xwmin, self.__Ywmin
-                xmax, ymax = self.__Xwmax, self.__Ywmax
+                    if RC1 & RC2:
+                        continue 
+
+                    x0_clipped, y0_clipped = x0, y0
+                    x1_clipped, y1_clipped = x1, y1
+
+                    m = (y1 - y0) / (x1 - x0) if x1 != x0 else None 
+
+                    if RC1 != 0:
+                        if RC1 & 1:
+                            y0_clipped = m * (self.__Xwmin+50 - x0) + y0
+                            x0_clipped = self.__Xwmin+50
+                        elif RC1 & 2:
+                            y0_clipped = m * (self.__Xwmax-50 - x0) + y0
+                            x0_clipped = self.__Xwmax -50
+                        if RC1 & 4:
+                            x0_clipped = x0 + (1/m) * (self.__Ywmin+50 - y0)
+                            y0_clipped = self.__Ywmin+50
+                        elif RC1 & 8:
+                            x0_clipped = x0 + (1/m) * (self.__Ywmax-50 - y0)
+                            y0_clipped = self.__Ywmax-50
+                        obj.getCoordinates()[0] = (x0_clipped, y0_clipped, z0, w0)
+                        
+
+                    if RC2 != 0:
+                        if RC2 & 1:
+                            y1_clipped = m * (self.__Xwmin+50 - x1) + y1
+                            x1_clipped = self.__Xwmin+50
+                        elif RC2 & 2:
+                            y1_clipped = m * (self.__Xwmax-50 - x1) + y1
+                            x1_clipped = self.__Xwmax-50
+                        if RC2 & 4:
+                            x1_clipped = x1 + (1/m) * (self.__Ywmin+50 - y1)
+                            y1_clipped = self.__Ywmin+50
+                        elif RC2 & 8:
+                            x1_clipped = x1 + (1/m) * (self.__Ywmax-50 - y1)
+                            y1_clipped = self.__Ywmax-50
+                        obj.getCoordinates()[1] = (x1_clipped, y1_clipped, z1, w1)
+
+                    to_be_Draw.append(obj)
+
+                elif line_clipping_method == 'Liang-Barsky':
+                    x0, y0, z0, w0 = obj.getCoordinates()[0]
+                    x1, y1, z1, w1 = obj.getCoordinates()[1]
+
+                    t0, t1 = 0.0, 1.0
+                    dx = x1 - x0
+                    dy = y1 - y0
+
+                    p = [-dx, dx, -dy, dy]
+                    q = [x0 - (self.__Xwmin+50), (self.__Xwmax-50) - x0, y0 - (self.__Ywmin+50), (self.__Ywmax-50) - y0]
+
+                    for i in range(4):
+                        if p[i] == 0:
+                            if q[i] < 0:
+                                break
+                        else:
+                            t = q[i] / p[i]
+                            if p[i] < 0:
+                                if t > t1:
+                                    break
+                                elif t > t0:
+                                    t0 = t
+                            else:
+                                if t < t0:
+                                    break
+                                elif t < t1:
+                                    t1 = t
+
+                    if t0 < t1:
+                        x0_clipped = x0 + t0 * dx
+                        y0_clipped = y0 + t0 * dy
+                        x1_clipped = x0 + t1 * dx
+                        y1_clipped = y0 + t1 * dy
+                        new_coords = [(x0_clipped, y0_clipped, z0, w0), (x1_clipped, y1_clipped, z1, w1)]
+
+                if new_coords:
+                    obj.setCoordinates(new_coords)
+                    to_be_Draw.append(obj)
+
+            elif type(obj) == WireFrame:
+                #Weiler-Atherton
+                xmin, ymin = self.__Xwmin+50, self.__Ywmin+50
+                xmax, ymax = self.__Xwmax-50, self.__Ywmax-50
                 vertices = obj.getCoordinates()
                 labels = self.label_vertices(vertices, xmin, xmax, ymin, ymax)
                 
@@ -244,22 +284,19 @@ class Window(Shape):
                 for i in range(len(vertices)):
                     start = vertices[i]
                     end = vertices[(i + 1) % len(vertices)]
-                    print('end',end)
                     start_label = labels[i]
                     end_label = labels[(i + 1) % len(vertices)]
                     
                     if start_label == 'inside' and end_label == 'inside':
-                        print('aqui1')
                         new_polygon.append(end.tolist())
                     elif start_label == 'inside' and end_label == 'outside':
-                        print('aqui2')
                         intersection = self.get_intersection(start, end, xmin, xmax, ymin, ymax)
                         new_polygon.append(list(intersection))
                     elif start_label == 'outside' and end_label == 'inside':
-                        print('aqui3')
                         intersection = self.get_intersection(start, end, xmin, xmax, ymin, ymax)
                         new_polygon.append(list(intersection))
                         new_polygon.append(end.tolist())
+
                 if new_polygon:
                     flat_polygon = []
                     for point in new_polygon:
