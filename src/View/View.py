@@ -70,6 +70,8 @@ class View(tk.Tk):
         self.bind("<Down>", self.arrow_key_pressed)
         self.bind("<MouseWheel>", self.zoom)
 
+        self.__view_port.create_rectangle(50,50,870,410, outline='red')
+
 
         #TO DO: DRAW THE LINE BASED IN THE POSITION OF THE CURSOR
 
