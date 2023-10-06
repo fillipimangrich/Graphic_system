@@ -136,7 +136,7 @@ class View(tk.Tk):
                     filetypes=(("obj files", "*.obj"),("all files", "*.*")))
         self.descriptor = DescritorOBJ()
         name, points = self.descriptor.parseOBJ(path)
-        wire_frame = WireFrame(name, points)
+        wire_frame = WireFrame(name, points, 'Arame')
         self.__controller.addObject(wire_frame)
         self.addObjectToList(wire_frame)
         self.draw()
