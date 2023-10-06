@@ -150,9 +150,8 @@ class Window(Shape):
 
         objs = copy.deepcopy(self.__world.getObjects())
         offset = ((self.__Xwmax-self.__Xwmin)/920)*50
-        offset2 = ((self.__Ywmax-self.__Ywmin)/460)*50
         xmin, ymin = self.__Xwmin+offset, self.__Ywmin+offset
-        xmax, ymax = self.__Xwmax-offset2, self.__Ywmax-offset2
+        xmax, ymax = self.__Xwmax-offset, self.__Ywmax-offset
         for obj in objs:
 
             if type(obj) == Point:
