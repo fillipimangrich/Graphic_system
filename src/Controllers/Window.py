@@ -354,7 +354,7 @@ class Window(Shape):
 
 
     def rotate(self, angle, axis):
-        x,y,z = self.getCenter()
+        x,y,z, w = self.getCenter()
         for obj in self.__world.getObjects():
             transform_matrix = MatrixHelper.calculateWindowRotationMatrix(obj,angle,axis,x,y,z)
             obj.transform(transform_matrix)
