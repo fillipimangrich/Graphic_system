@@ -65,7 +65,7 @@ class Window(Shape):
     def getCenter(self):
         x = ((self.getXwmax()-self.getXwmin())/2)+self.getXwmin()
         y = ((self.getYwmax()-self.getYwmin())/2)+self.getYwmin()
-        return x,y,0
+        return x,y,0,1
     
     def is_inside_window(self, p, xmin, xmax, ymin, ymax):
         x, y, z, w = p

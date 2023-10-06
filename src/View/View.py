@@ -137,8 +137,11 @@ class View(tk.Tk):
         self.descriptor = DescritorOBJ()
         name, points = self.descriptor.parseOBJ(path)
         wire_frame = WireFrame(name, points, 'Arame')
+        x,y,z,w = self.__controller.getViewport().getWindow().getCenter()-wire_frame.calcObjectCenter()
+        wire_frame.transform(MatrixHelper.getTranslationMatrix(x,y,z))
         self.__controller.addObject(wire_frame)
         self.addObjectToList(wire_frame)
+
         self.draw()
 
     def setRotationWindowButton(self) -> None:
