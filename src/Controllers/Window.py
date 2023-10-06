@@ -101,7 +101,7 @@ class Window(Shape):
         if RC1 & RC2:
             return None, None
 
-        m = (y1 - y0) / (x1 - x0) if x1 != x0 else None 
+        m = (y1 - y0) / (x1 - x0) if x1 != x0 else float('inf')
 
         if RC1 != 0:
             if RC1 & 1:

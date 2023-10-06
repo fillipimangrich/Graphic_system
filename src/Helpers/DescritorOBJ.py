@@ -21,6 +21,4 @@ class DescritorOBJ():
                 break
         return name, vertices
 
-a = DescritorOBJ()
 
-a
