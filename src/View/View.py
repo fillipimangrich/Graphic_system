@@ -338,7 +338,6 @@ class View(tk.Tk):
             color = obj.getColor()
             coordinates = obj.getCoordinates()
             object_type = type(obj)
-            print(object_type)
             if object_type == Point:
                 self.drawPoint(color, coordinates)
             elif object_type == Line:
@@ -457,10 +456,6 @@ class View(tk.Tk):
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawBezierCurve(self, color, control_points, num_segments=100):
-        print("aqui")
-        if len(control_points) != 3:
-            raise ValueError("Uma curva de Bezier quadrática requer exatamente 3 pontos de controle.")
-        
         p0, p1, p2, = control_points
 
         for t in range(num_segments):
