@@ -3,6 +3,7 @@ from src.Helpers.MatrixHelper import MatrixHelper
 from src.shapes.Shape import Shape
 from src.shapes.Point import Point
 from src.shapes.Line import Line
+from src.shapes.Curve import Curve
 from src.Controllers.World import World
 from src.Settings.Settings import Settings
 
@@ -307,6 +308,9 @@ class Window(Shape):
                             flat_polygon.append(point)
                     new_obj = WireFrame(obj.getName(), flat_polygon, obj.fill_mode)
                     to_be_Draw.append(new_obj)
+                
+            elif(type(obj) == Curve):
+                to_be_Draw.append(obj)
                     
 
         self.setObjectsToBeDraw(to_be_Draw)

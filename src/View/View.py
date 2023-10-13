@@ -9,6 +9,7 @@ from src.View.RotateWindowTab import Rotation
 from src.Controllers.Controller import Controller
 from src.shapes.Point import Point
 from src.shapes.Line import Line
+from src.shapes.Curve import Curve
 from src.shapes.WireFrame import WireFrame
 from src.Helpers.MatrixHelper import MatrixHelper
 from src.Helpers.DescritorOBJ import DescritorOBJ
@@ -36,7 +37,6 @@ class View(tk.Tk):
         self.setRotationWindowButton()
         self.setOBJButton()
         self.setClippingAlghoritmsButtons()
-
         self.mainloop()
     
 
@@ -177,6 +177,9 @@ class View(tk.Tk):
         line_button.pack(pady=10)
 
         wire_frame_button = tk.Button(popup, text="Wire Frame", command=lambda: self.setDrawingObject("Wire Frame", popup))
+        wire_frame_button.pack(pady=10)
+
+        wire_frame_button = tk.Button(popup, text="Curve", command=lambda: self.setDrawingObject("Curve", popup))
         wire_frame_button.pack(pady=10)
 
         
@@ -330,15 +333,18 @@ class View(tk.Tk):
         self.setViewPort()
         if(event is not None):
             self.handleWithEvent(event)
-
+        
         for obj in self.__controller.getListOfObjects():
             color = obj.getColor()
             coordinates = obj.getCoordinates()
             object_type = type(obj)
+            print(object_type)
             if object_type == Point:
                 self.drawPoint(color, coordinates)
             elif object_type == Line:
                 self.drawLine(color, coordinates)
+            elif object_type == Curve:
+                self.drawBezierCurve(color,coordinates)
             else:
                 if obj.fill_mode == "Arame":
                     self.drawWireFrame(color, coordinates)
@@ -346,7 +352,7 @@ class View(tk.Tk):
                     self.drawGridWireFrame(color, coordinates, 25)
                 else:
                     self.drawFilledWireFrame(color, coordinates)
-    
+        
 
     def handleWithEvent(self, event):
         if(self.__drawing_object == 'Point'):
@@ -398,9 +404,29 @@ class View(tk.Tk):
                 if(self.__points_counter == 2):
                     self.addObjectToList(wire_frame)
                     self.addLogs('Adicionou Wireframe - '+ wire_frame.getName())
-                
                 self.__points_counter += 1
 
+        elif(self.__drawing_object == 'Curve'):
+            if(self.__points_counter == 0):
+                point = Point(self.__object_name, [(event.x, event.y, 0)])
+                self.__controller.addObject(point)
+                self.__points_counter += 1
+
+            elif(self.__points_counter == 1):
+                point = Point(self.__object_name, [(event.x, event.y, 0)])
+                self.__controller.addObject(point)
+                self.__points_counter += 1
+            else:
+                first_point = self.__controller.getListOfObjects()[-2]
+                second_point = self.__controller.getListOfObjects()[-1]
+                self.__object_name = askstring("Nome","Digite o nome")
+                curve = Curve(self.__object_name, [first_point.getCoordinates()[0],second_point.getCoordinates()[0], (event.x, event.y, 0)])
+                self.addLogs('Adicionou curva - '+ curve.getName())
+                self.__controller.popWorldObject()
+                self.__controller.popWorldObject()
+                self.__controller.addObject(curve)
+                self.addObjectToList(curve)
+                self.__points_counter = 0
 
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
@@ -430,6 +456,21 @@ class View(tk.Tk):
                 x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
+    def drawBezierCurve(self, color, control_points, num_segments=100):
+        print("aqui")
+        if len(control_points) != 3:
+            raise ValueError("Uma curva de Bezier quadrática requer exatamente 3 pontos de controle.")
+        
+        p0, p1, p2, = control_points
+
+        for t in range(num_segments):
+            t0 = t / num_segments
+            t1 = (t + 1) / num_segments
+            x0 = (1 - t0) ** 2 * p0[0] + 2 * (1 - t0) * t0 * p1[0] + t0 ** 2 * p2[0]
+            y0 = (1 - t0) ** 2 * p0[1] + 2 * (1 - t0) * t0 * p1[1] + t0 ** 2 * p2[1]
+            x1 = (1 - t1) ** 2 * p0[0] + 2 * (1 - t1) * t1 * p1[0] + t1 ** 2 * p2[0]
+            y1 = (1 - t1) ** 2 * p0[1] + 2 * (1 - t1) * t1 * p1[1] + t1 ** 2 * p2[1]
+            self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
     
     def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
         for point in range(len(coordinates)):
@@ -457,6 +498,7 @@ class View(tk.Tk):
                 y_end = intersections[i+1]
                 self.__view_port.create_line(x, y_start, x, y_end, fill=color, width=self.__line_width)
 
+    
 
     def getHorizontalIntersections(self, y, coordinates):
         intersections = []
