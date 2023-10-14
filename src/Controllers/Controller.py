@@ -31,6 +31,7 @@ class Controller():
     
     def popWorldObject(self):
         self.__viewport.getWindow().getWorld().getObjects().pop()
+        self.update()
     
     def getViewport(self):
         return self.__viewport

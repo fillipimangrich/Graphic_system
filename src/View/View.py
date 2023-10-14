@@ -1,4 +1,5 @@
 import tkinter as tk
+import numpy as np
 from tkinter import filedialog
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
@@ -406,6 +407,7 @@ class View(tk.Tk):
                 self.__points_counter += 1
 
         elif(self.__drawing_object == 'Curve'):
+
             if(self.__points_counter == 0):
                 point = Point(self.__object_name, [(event.x, event.y, 0)])
                 self.__controller.addObject(point)
@@ -415,17 +417,39 @@ class View(tk.Tk):
                 point = Point(self.__object_name, [(event.x, event.y, 0)])
                 self.__controller.addObject(point)
                 self.__points_counter += 1
-            else:
+
+            elif(self.__points_counter == 2):
                 first_point = self.__controller.getListOfObjects()[-2]
                 second_point = self.__controller.getListOfObjects()[-1]
-                self.__object_name = askstring("Nome","Digite o nome")
+                self.__controller.popWorldObject()
+                self.__controller.popWorldObject()                 
+                self.__object_name = askstring("Nome","Digite o nome")  
                 curve = Curve(self.__object_name, [first_point.getCoordinates()[0],second_point.getCoordinates()[0], (event.x, event.y, 0)])
                 self.addLogs('Adicionou curva - '+ curve.getName())
-                self.__controller.popWorldObject()
-                self.__controller.popWorldObject()
-                self.__controller.addObject(curve)
                 self.addObjectToList(curve)
-                self.__points_counter = 0
+                self.__controller.addObject(curve)
+                self.__points_counter = 4
+            
+            elif(self.__points_counter%2 == 0):
+                point = Point(self.__object_name, [(event.x, event.y, 0)])
+                self.__controller.addObject(point)
+                self.__points_counter += 1
+
+            elif(self.__points_counter%2 == 1):
+                first_point = self.__controller.getListOfObjects()[-1]
+                self.__controller.popWorldObject()
+
+                x = [x for x in self.__controller.getListOfObjects()[-1].getCoordinates()]
+                x.append(first_point.getCoordinates()[0])
+                x.append((event.x, event.y, 0))
+                curve = self.__controller.getListOfObjectsOfWorld()[-1]
+                curve.setCoordinates(x)
+                self.__controller.popWorldObject()
+                new = Curve(curve.getName(), curve.getCoordinates())
+                new.setId(curve.getId())
+                self.__controller.addObject(new)
+                self.__points_counter += 1
+
 
     def drawPoint(self, color, coordinates):
         p1 = coordinates[0]
@@ -456,16 +480,17 @@ class View(tk.Tk):
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawBezierCurve(self, color, control_points, num_segments=100):
-        p0, p1, p2, = control_points
+        for i in range(0, len(control_points)-2,2):
+            p0, p1, p2, = control_points[i], control_points[i+1], control_points[i+2]
 
-        for t in range(num_segments):
-            t0 = t / num_segments
-            t1 = (t + 1) / num_segments
-            x0 = (1 - t0) ** 2 * p0[0] + 2 * (1 - t0) * t0 * p1[0] + t0 ** 2 * p2[0]
-            y0 = (1 - t0) ** 2 * p0[1] + 2 * (1 - t0) * t0 * p1[1] + t0 ** 2 * p2[1]
-            x1 = (1 - t1) ** 2 * p0[0] + 2 * (1 - t1) * t1 * p1[0] + t1 ** 2 * p2[0]
-            y1 = (1 - t1) ** 2 * p0[1] + 2 * (1 - t1) * t1 * p1[1] + t1 ** 2 * p2[1]
-            self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
+            for t in range(num_segments):
+                t0 = t / num_segments
+                t1 = (t + 1) / num_segments
+                x0 = (1 - t0) ** 2 * p0[0] + 2 * (1 - t0) * t0 * p1[0] + t0 ** 2 * p2[0]
+                y0 = (1 - t0) ** 2 * p0[1] + 2 * (1 - t0) * t0 * p1[1] + t0 ** 2 * p2[1]
+                x1 = (1 - t1) ** 2 * p0[0] + 2 * (1 - t1) * t1 * p1[0] + t1 ** 2 * p2[0]
+                y1 = (1 - t1) ** 2 * p0[1] + 2 * (1 - t1) * t1 * p1[1] + t1 ** 2 * p2[1]
+                self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
     
     def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
         for point in range(len(coordinates)):
