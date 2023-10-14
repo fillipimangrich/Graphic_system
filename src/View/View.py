@@ -5,6 +5,7 @@ from tkinter import ttk
 from tkinter.colorchooser import askcolor
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+from src.Settings.Settings import Settings
 from src.View.ChoiceDialog import ChoiceDialog
 from src.View.RotateWindowTab import Rotation
 from src.Controllers.Controller import Controller
@@ -479,6 +480,41 @@ class View(tk.Tk):
                 x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
+    def clippingCurve(self, x0, y0, x1, y1):
+        if x0 < Settings.XWMIN + 50:
+            y0 = y0 + (y1 - y0) * (Settings.XWMIN + 50 - x0) / (x1 - x0)
+            x0 = Settings.XWMIN + 50
+
+        if x1 < Settings.XWMIN + 50:
+            y1 = y0 + (y1 - y0) * (Settings.XWMIN + 50 - x0) / (x1 - x0)
+            x1 = Settings.XWMIN + 50
+
+        if x0 > Settings.XWMAX - 50:
+            y0 = y0 + (y1 - y0) * (Settings.XWMAX - 50 - x0) / (x1 - x0)
+            x0 = Settings.XWMAX - 50
+
+        if x1 > Settings.XWMAX - 50:
+            y1 = y0 + (y1 - y0) * (Settings.XWMAX - 50 - x0) / (x1 - x0)
+            x1 = Settings.XWMAX - 50
+
+        if y0 < Settings.YWMIN + 50:
+            x0 = x0 + (x1 - x0) * (Settings.YWMIN + 50 - y0) / (y1 - y0)
+            y0 = Settings.YWMIN + 50
+
+        if y1 < Settings.YWMIN + 50:
+            x1 = x0 + (x1 - x0) * (Settings.YWMIN + 50 - y0) / (y1 - y0)
+            y1 = Settings.YWMIN + 50
+
+        if y0 > Settings.YWMAX - 50:
+            x0 = x0 + (x1 - x0) * (Settings.YWMAX - 50 - y0) / (y1 - y0)
+            y0 = Settings.YWMAX - 50
+            
+        if y1 > Settings.YWMAX - 50:
+            x1 = x0 + (x1 - x0) * (Settings.YWMAX - 50 - y0) / (y1 - y0)
+            y1 = Settings.YWMAX - 50
+
+        return x0, y0, x1, y1
+
     def drawBezierCurve(self, color, control_points, num_segments=100):
         for i in range(0, len(control_points)-2, 2):
             p0, p1, p2 = control_points[i], control_points[i+1], control_points[i+2]
@@ -494,7 +530,10 @@ class View(tk.Tk):
                 y0 = (1 - t0) ** 2 * p0[1] + 2 * (1 - t0) * t0 * p1[1] + t0 ** 2 * p2[1]
                 x1 = (1 - t1) ** 2 * p0[0] + 2 * (1 - t1) * t1 * p1[0] + t1 ** 2 * p2[0]
                 y1 = (1 - t1) ** 2 * p0[1] + 2 * (1 - t1) * t1 * p1[1] + t1 ** 2 * p2[1]
-                self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
+
+                x0, y0, x1, y1 = self.clippingCurve(x0, y0, x1, y1)
+                if x0 is not None:
+                    self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
     
     def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
         for point in range(len(coordinates)):
