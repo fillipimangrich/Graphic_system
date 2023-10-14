@@ -480,8 +480,12 @@ class View(tk.Tk):
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
 
     def drawBezierCurve(self, color, control_points, num_segments=100):
-        for i in range(0, len(control_points)-2,2):
-            p0, p1, p2, = control_points[i], control_points[i+1], control_points[i+2]
+        for i in range(0, len(control_points)-2, 2):
+            p0, p1, p2 = control_points[i], control_points[i+1], control_points[i+2]
+
+            if i > 0:
+                prev_p1 = control_points[i-1]
+                p1 = (2 * p0[0] - prev_p1[0], 2 * p0[1] - prev_p1[1], 1)
 
             for t in range(num_segments):
                 t0 = t / num_segments
