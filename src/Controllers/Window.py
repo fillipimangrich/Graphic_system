@@ -1,3 +1,4 @@
+from src.shapes.BSpline import BSpline
 from src.shapes.WireFrame import WireFrame
 from src.Helpers.MatrixHelper import MatrixHelper
 from src.shapes.Shape import Shape
@@ -310,6 +311,9 @@ class Window(Shape):
                     to_be_Draw.append(new_obj)
                 
             elif(type(obj) == Curve):
+                to_be_Draw.append(obj)
+            
+            elif(type(obj) == BSpline):
                 to_be_Draw.append(obj)
                     
 

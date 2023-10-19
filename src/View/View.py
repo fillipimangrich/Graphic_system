@@ -1,10 +1,11 @@
 import tkinter as tk
 import numpy as np
-from tkinter import filedialog
+from tkinter import Button, filedialog
 from tkinter import ttk
 from tkinter.colorchooser import askcolor
 from tkinter.messagebox import showinfo
 from tkinter.simpledialog import askstring
+from src.shapes.BSpline import BSpline
 from src.Settings.Settings import Settings
 from src.View.ChoiceDialog import ChoiceDialog
 from src.View.RotateWindowTab import Rotation
@@ -36,14 +37,23 @@ class View(tk.Tk):
         self.setListOfObjectsView()
         self.setControlView()
         self.setAddObjectButton()
+        self.setFinalizeBSplineButton()
         self.setRotationWindowButton()
         self.setOBJButton()
-        self.setClippingAlghoritmsButtons()
+        self.setClippingAlghoritmsButtons()        
+        self.__control.itemconfigure(self.button_finalize_bspline, state='hidden')
+        self.__control.itemconfigure(self.button_add, state='normal')
         self.mainloop()
     
 
     def on_algorithm_selected(self, evt):
         self.__controller.chosen_clipping_algorithm = self.__algorithm_combobox.get()
+
+
+    def setFinalizeBSplineButton(self):
+        self.finalize_bspline_image = tk.PhotoImage(file = f"src/Images/finalizar_bspline.png")
+        self.button_finalize_bspline = self.__control.create_image(230, 50, image=self.finalize_bspline_image)
+        self.__control.tag_bind(self.button_finalize_bspline, "<Button-1>", self.finalizeBSpline)
 
 
     def setClippingAlghoritmsButtons(self):
@@ -57,9 +67,17 @@ class View(tk.Tk):
 
 
     def setDrawingObject(self, drawing_object, popup):
+        if drawing_object == "BSpline":
+            self.__control.itemconfigure(self.button_finalize_bspline, state='normal')
+            self.__control.itemconfigure(self.button_add, state='hidden')
+        else:
+            self.__control.itemconfigure(self.button_finalize_bspline, state='hidden')
+            self.__control.itemconfigure(self.button_add, state='normal')
         self.__drawing_object = drawing_object
         self.__points_counter = 0
-        popup.destroy()
+
+        if popup != None:
+            popup.destroy()
 
     def setViewPort(self) -> None:
         self.__view_port = tk.Canvas(
@@ -123,8 +141,8 @@ class View(tk.Tk):
 
     def setAddObjectButton(self) -> None:
         self.__add_object_button = tk.PhotoImage(file = f"src/Images/add_button.png")
-        button_add = self.__control.create_image(230, 50, image=self.__add_object_button)
-        self.__control.tag_bind(button_add, "<Button-1>", lambda x: self.openViewForAddNewShape())
+        self.button_add = self.__control.create_image(230, 50, image=self.__add_object_button)
+        self.__control.tag_bind(self.button_add, "<Button-1>", lambda x: self.openViewForAddNewShape())
 
 
     def setOBJButton(self) -> None:
@@ -182,6 +200,9 @@ class View(tk.Tk):
         wire_frame_button.pack(pady=10)
 
         wire_frame_button = tk.Button(popup, text="Curve", command=lambda: self.setDrawingObject("Curve", popup))
+        wire_frame_button.pack(pady=10)
+
+        wire_frame_button = tk.Button(popup, text="B-Spline", command=lambda: self.setDrawingObject("BSpline", popup))
         wire_frame_button.pack(pady=10)
 
         
@@ -346,6 +367,8 @@ class View(tk.Tk):
                 self.drawLine(color, coordinates)
             elif object_type == Curve:
                 self.drawBezierCurve(color,coordinates)
+            elif object_type == BSpline:
+                self.drawBSpline(color, coordinates)
             else:
                 if obj.fill_mode == "Arame":
                     self.drawWireFrame(color, coordinates)
@@ -450,6 +473,33 @@ class View(tk.Tk):
                 new.setId(curve.getId())
                 self.__controller.addObject(new)
                 self.__points_counter += 1
+        elif(self.__drawing_object == 'BSpline'):
+            point = Point(self.__object_name, [(event.x, event.y, 0)])
+            self.__controller.addObject(point)
+            self.__points_counter += 1
+
+    
+    def finalizeBSpline(self, event=None):
+        if self.__points_counter < 4:
+            print("Insira pelo menos 4 pontos para desenhar uma B-spline.")
+            return
+
+        self.__object_name = askstring("Nome", "Digite o nome")
+        points = [obj.getCoordinates()[0] for obj in self.__controller.getListOfObjects()[-self.__points_counter:]]
+        
+        bspline = BSpline(self.__object_name, points)
+
+        for _ in range(self.__points_counter):
+            self.__controller.popWorldObject()
+
+        self.addLogs('Adicionou BSpline - '+ bspline.getName())
+        self.addObjectToList(bspline)
+        self.__controller.addObject(bspline)
+        self.__points_counter = 0
+        self.draw()
+        self.__control.itemconfigure(self.button_finalize_bspline, state='hidden')
+        self.__control.itemconfigure(self.button_add, state='normal')
+        self.setDrawingObject("Point", None)
 
 
     def drawPoint(self, color, coordinates):
@@ -479,6 +529,7 @@ class View(tk.Tk):
                 x1, y1, z1, w = p1
                 x2, y2, z2, w = p2
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
+
 
     def clippingCurve(self, x0, y0, x1, y1):
         if x0 < Settings.XWMIN + 50:
@@ -515,6 +566,7 @@ class View(tk.Tk):
 
         return x0, y0, x1, y1
 
+
     def drawBezierCurve(self, color, control_points, num_segments=100):
         for i in range(0, len(control_points)-2, 2):
             p0, p1, p2 = control_points[i], control_points[i+1], control_points[i+2]
@@ -534,7 +586,51 @@ class View(tk.Tk):
                 x0, y0, x1, y1 = self.clippingCurve(x0, y0, x1, y1)
                 if x0 is not None:
                     self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
-    
+
+
+    def drawBSpline(self, color, control_points, num_segments=1000):
+        if len(control_points) < 4:
+            return
+
+        delta = 1.0 / num_segments
+
+        M = [
+            [1/6, 2/3, 1/6, 0],
+            [-0.5, 0, 0.5, 0],
+            [0.5, -1, 0.5, 0],
+            [-1/6, 0.5, -0.5, 1/6]
+        ]
+
+        for i in range(len(control_points) - 3):
+            G = [list(control_points[i+j]) for j in range(4)]
+
+            x = sum(M[0][j] * G[j][0] for j in range(4))
+            y = sum(M[0][j] * G[j][1] for j in range(4))
+
+            dx = delta * sum(M[1][j] * G[j][0] for j in range(4))
+            dy = delta * sum(M[1][j] * G[j][1] for j in range(4))
+
+            ddx = delta**2 * sum(M[2][j] * G[j][0] for j in range(4))
+            ddy = delta**2 * sum(M[2][j] * G[j][1] for j in range(4))
+
+            dddx = delta**3 * sum(M[3][j] * G[j][0] for j in range(4))
+            dddy = delta**3 * sum(M[3][j] * G[j][1] for j in range(4))
+
+            for _ in range(num_segments):
+                next_x = x + dx + 0.5 * ddx + (1/6) * dddx
+                next_y = y + dy + 0.5 * ddy + (1/6) * dddy
+
+                self.__view_port.create_line(x, y, next_x, next_y, fill=color, width=self.__line_width)
+
+                # forward differences
+                x = next_x
+                y = next_y
+                dx += ddx + 0.5 * dddx
+                dy += ddy + 0.5 * dddy
+                ddx += dddx
+                ddy += dddy
+
+
     def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
         for point in range(len(coordinates)):
             p1 = coordinates[point]
@@ -561,7 +657,6 @@ class View(tk.Tk):
                 y_end = intersections[i+1]
                 self.__view_port.create_line(x, y_start, x, y_end, fill=color, width=self.__line_width)
 
-    
 
     def getHorizontalIntersections(self, y, coordinates):
         intersections = []
