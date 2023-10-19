@@ -588,47 +588,40 @@ class View(tk.Tk):
                     self.__view_port.create_line(x0, y0, x1, y1, fill=color, width=self.__line_width)
 
 
-    def drawBSpline(self, color, control_points, num_segments=1000):
+    def drawBSpline(self, color, control_points, num_segments=500):
         if len(control_points) < 4:
             return
+
+        expanded_points = []
+        for _ in range(3):
+            expanded_points.append(control_points[0])
+        expanded_points.extend(control_points)
+        for _ in range(3):
+            expanded_points.append(control_points[-1])
+        control_points = expanded_points
 
         delta = 1.0 / num_segments
 
         M = [
-            [1/6, 2/3, 1/6, 0],
-            [-0.5, 0, 0.5, 0],
-            [0.5, -1, 0.5, 0],
-            [-1/6, 0.5, -0.5, 1/6]
+            [-1/6, 3/6, -3/6, 1/6],
+            [3/6, -6/6, 3/6, 0],
+            [-3/6, 0, 3/6, 0],
+            [1/6, 4/6, 1/6, 0]
         ]
 
-        for i in range(len(control_points) - 3):
-            G = [list(control_points[i+j]) for j in range(4)]
+        for i in range(3, len(control_points)):
+            G = [list(control_points[i-j]) for j in reversed(range(4))]
+            for t in [j * delta for j in range(num_segments)]:
+                t_values = [t**3, t**2, t, 1]
+                x = sum(sum(M[row][col] * G[col][0] for col in range(4)) * t_values[row] for row in range(4))
+                y = sum(sum(M[row][col] * G[col][1] for col in range(4)) * t_values[row] for row in range(4))
 
-            x = sum(M[0][j] * G[j][0] for j in range(4))
-            y = sum(M[0][j] * G[j][1] for j in range(4))
-
-            dx = delta * sum(M[1][j] * G[j][0] for j in range(4))
-            dy = delta * sum(M[1][j] * G[j][1] for j in range(4))
-
-            ddx = delta**2 * sum(M[2][j] * G[j][0] for j in range(4))
-            ddy = delta**2 * sum(M[2][j] * G[j][1] for j in range(4))
-
-            dddx = delta**3 * sum(M[3][j] * G[j][0] for j in range(4))
-            dddy = delta**3 * sum(M[3][j] * G[j][1] for j in range(4))
-
-            for _ in range(num_segments):
-                next_x = x + dx + 0.5 * ddx + (1/6) * dddx
-                next_y = y + dy + 0.5 * ddy + (1/6) * dddy
-
-                self.__view_port.create_line(x, y, next_x, next_y, fill=color, width=self.__line_width)
-
-                # forward differences
-                x = next_x
-                y = next_y
-                dx += ddx + 0.5 * dddx
-                dy += ddy + 0.5 * dddy
-                ddx += dddx
-                ddy += dddy
+                if t > 0:
+                    prev_x, prev_y, x, y = self.clippingCurve(prev_x, prev_y, x, y)
+                    if prev_x is not None:
+                        self.__view_port.create_line(prev_x, prev_y, x, y, fill=color, width=self.__line_width)
+                        
+                prev_x, prev_y = x, y
 
 
     def drawGridWireFrame(self, color, coordinates, grid_spacing=10):
