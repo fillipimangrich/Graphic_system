@@ -16,7 +16,7 @@ class DescritorOBJ():
                 name = line.split()[1]
             elif(line[0] in ["v", "vt", "vn", "vp"]):
                 _,x,y,z = line.split()
-                vertices.append((float(x),float(y),0))
+                vertices.append((float(x),float(y),float(z)))
             elif(line[0] == "a"):
                 break
         return name, vertices
