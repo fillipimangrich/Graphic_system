@@ -5,6 +5,7 @@ from src.shapes.Shape import Shape
 from src.shapes.Point import Point
 from src.shapes.Line import Line
 from src.shapes.Curve import Curve
+from src.shapes.OBJ import OBJ
 from src.Controllers.World import World
 from src.Settings.Settings import Settings
 
@@ -146,15 +147,34 @@ class Window(Shape):
     
     def updateObjects(self, line_clipping_method):
 
-        self.setNormalizedCoordinates()
-
         to_be_Draw = []
+
+        x = self.__Xwmax - self.__Xwmin
+        y = self.__Ywmax - self.__Ywmin
+
+
+        projection = [[1,0,-x/1000,0],[0,1,-y/1000,0],[0,0,0,0],[0,0,-1/1000,1]]
+ 
+
 
         objs = copy.deepcopy(self.__world.getObjects())
         offset = ((self.__Xwmax-self.__Xwmin)/920)*50
         xmin, ymin = self.__Xwmin+offset, self.__Ywmin+offset
         xmax, ymax = self.__Xwmax-offset, self.__Ywmax-offset
+
         for obj in objs:
+            # new_points = []
+            # for point in obj.getCoordinates():
+            #     x1,y1,z1,w1 = point
+            #     xc,yc,zc,wc = obj.calcObjectCenter()
+            #     a = MatrixHelper.getTranslationMatrix(-(x1-xc),-(y1-yc),-(z1-zc))
+            #     b = MatrixHelper.getTranslationMatrix(x1-xc,y1-yc,z1-zc)
+            #     first_transform = a@point
+            #     perspective = first_transform@projection
+            #     final = perspective@b
+            #     new_points.append(final)
+            obj.setCoordinates([projection@x for x in obj.getCoordinates()])
+            # obj.setCoordinates(new_points)
 
             if type(obj) == Point:
                 x,y,z,w = obj.getCoordinates()[0]
@@ -315,9 +335,13 @@ class Window(Shape):
             
             elif(type(obj) == BSpline):
                 to_be_Draw.append(obj)
+            
+            elif(type(obj) == OBJ):
+                to_be_Draw.append(obj)
                     
 
         self.setObjectsToBeDraw(to_be_Draw)
+        self.setNormalizedCoordinates()
                     
     
     def windowTransform(self, coordinates):

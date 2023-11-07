@@ -12,6 +12,7 @@ from src.shapes.Point import Point
 from src.shapes.Line import Line
 from src.shapes.Curve import Curve
 from src.shapes.WireFrame import WireFrame
+from src.shapes.OBJ import OBJ
 from src.Helpers.MatrixHelper import MatrixHelper
 from src.Helpers.DescritorOBJ import DescritorOBJ
 from src.View.TransformObjectsView import TransformObjectsView
@@ -136,8 +137,9 @@ class View(tk.Tk):
         path = filedialog.askopenfilename(initialdir="/", title="Select file",
                     filetypes=(("obj files", "*.obj"),("all files", "*.*")))
         self.descriptor = DescritorOBJ()
-        name, points = self.descriptor.parseOBJ(path)
-        wire_frame = WireFrame(name, points, 'Arame')
+        name, points, faces = self.descriptor.parseOBJ(path)
+        # wire_frame = WireFrame(name, points, 'Arame')
+        wire_frame = OBJ(name, points, 'Arame', faces)
         x,y,z,w = self.__controller.getViewport().getWindow().getCenter()-wire_frame.calcObjectCenter()
         wire_frame.transform(MatrixHelper.getTranslationMatrix(x,y,z))
         self.__controller.addObject(wire_frame)
@@ -345,6 +347,8 @@ class View(tk.Tk):
                 self.drawLine(color, coordinates)
             elif object_type == Curve:
                 self.drawBezierCurve(color,coordinates)
+            elif object_type == OBJ:
+                self.drawObj(color, obj)
             else:
                 if obj.fill_mode == "Arame":
                     self.drawWireFrame(color, coordinates)
@@ -357,7 +361,7 @@ class View(tk.Tk):
     def handleWithEvent(self, event):
         if(self.__drawing_object == 'Point'):
             self.__object_name = askstring("Nome","Digite o nome")
-            point = Point(self.__object_name, [(event.x, event.y, 0)])
+            point = Point(self.__object_name, [(event.x, event.y, 10)])
             self.addLogs('Adicionou ponto - '+ point.getName())
             self.addObjectToList(point)
             self.__controller.addObject(point)  
@@ -370,7 +374,7 @@ class View(tk.Tk):
             else:
                 first_point = self.__controller.getListOfObjects()[-1]
                 self.__object_name = askstring("Nome","Digite o nome")
-                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 10)])
                 self.addLogs('Adicionou linha - '+ line.getName())
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
@@ -384,7 +388,7 @@ class View(tk.Tk):
                 self.__points_counter += 1
             elif(self.__points_counter == 1):
                 first_point = self.__controller.getListOfObjects()[-1]
-                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 0)])
+                line = Line(self.__object_name, [first_point.getCoordinates()[0], (event.x, event.y, 10)])
                 self.__controller.popWorldObject()
                 self.__controller.addObject(line)
                 self.__points_counter += 1
@@ -409,12 +413,12 @@ class View(tk.Tk):
         elif(self.__drawing_object == 'Curve'):
 
             if(self.__points_counter == 0):
-                point = Point(self.__object_name, [(event.x, event.y, 0)])
+                point = Point(self.__object_name, [(event.x, event.y, 10)])
                 self.__controller.addObject(point)
                 self.__points_counter += 1
 
             elif(self.__points_counter == 1):
-                point = Point(self.__object_name, [(event.x, event.y, 0)])
+                point = Point(self.__object_name, [(event.x, event.y, 10)])
                 self.__controller.addObject(point)
                 self.__points_counter += 1
 
@@ -470,24 +474,19 @@ class View(tk.Tk):
                 p1 = coordinates[point]
                 p2 = coordinates[point + 1]
                 x1, y1, z1, w = p1
-                xa = (x1/z1)*1
-                ya = (y1/z1)*1
                 x2, y2, z2, w = p2
-                xb = (x2/z2)*1
-                yb = (y2/z2)*1
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
-                #self.__view_port.create_line(xa, ya, xb, yb, fill=color, width=self.__line_width)
             else:
                 p1 = coordinates[-1]
                 p2 = coordinates[0]
                 x1, y1, z1, w = p1
-                xa = (x1/z1)*1
-                ya = (y1/z1)*1
                 x2, y2, z2, w = p2
-                xb = (x2/z2)*1
-                yb = (y2/z2)*1
                 self.__view_port.create_line(x1, y1, x2, y2, fill=color, width=self.__line_width)
-                #self.__view_port.create_line(xa, ya, xb, yb, fill=color, width=self.__line_width)
+
+    
+    def drawObj(self, color, Obj):
+        for face in Obj.faces:
+            self.drawWireFrame(color, [Obj.getCoordinates()[x-1] for x in face])
 
     def drawBezierCurve(self, color, control_points, num_segments=100):
         for i in range(0, len(control_points)-2,2):
